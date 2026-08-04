@@ -1,0 +1,4 @@
+{
+  "installCommand": "pnpm install --frozen-lockfile",
+  "buildCommand": "pnpm --filter @workspace/api-server run build && node scripts/vercel-build.mjs"
+}

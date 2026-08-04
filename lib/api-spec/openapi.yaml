@@ -3,13 +3,24 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Sure-Bet-Analyzer API specification
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: sports
+    description: Sport categories
+  - name: bookmakers
+    description: Bookmaker management
+  - name: events
+    description: Sporting events
+  - name: odds
+    description: Odds submitted per bookmaker
+  - name: opportunities
+    description: Arbitrage opportunities
+
 paths:
   /healthz:
     get:
@@ -24,7 +35,378 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  # ── Sports ──────────────────────────────────────────────────────────────────
+
+  /sports:
+    get:
+      operationId: listSports
+      tags: [sports]
+      summary: List sports
+      responses:
+        "200":
+          description: List of sports
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Sport"
+    post:
+      operationId: createSport
+      tags: [sports]
+      summary: Create sport
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSportRequest"
+      responses:
+        "201":
+          description: Created sport
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Sport"
+        "409":
+          description: Sport already exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /sports/{id}:
+    get:
+      operationId: getSport
+      tags: [sports]
+      summary: Get sport by ID
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "200":
+          description: Sport
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Sport"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteSport
+      tags: [sports]
+      summary: Delete sport
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # ── Bookmakers ───────────────────────────────────────────────────────────────
+
+  /bookmakers:
+    get:
+      operationId: listBookmakers
+      tags: [bookmakers]
+      summary: List bookmakers
+      responses:
+        "200":
+          description: List of bookmakers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Bookmaker"
+    post:
+      operationId: createBookmaker
+      tags: [bookmakers]
+      summary: Create bookmaker
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateBookmakerRequest"
+      responses:
+        "201":
+          description: Created bookmaker
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Bookmaker"
+        "409":
+          description: Bookmaker already exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /bookmakers/{id}:
+    get:
+      operationId: getBookmaker
+      tags: [bookmakers]
+      summary: Get bookmaker by ID
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "200":
+          description: Bookmaker
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Bookmaker"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteBookmaker
+      tags: [bookmakers]
+      summary: Delete bookmaker
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # ── Events ───────────────────────────────────────────────────────────────────
+
+  /events:
+    get:
+      operationId: listEvents
+      tags: [events]
+      summary: List events
+      parameters:
+        - name: sportId
+          in: query
+          schema:
+            type: integer
+        - name: status
+          in: query
+          schema:
+            $ref: "#/components/schemas/EventStatus"
+      responses:
+        "200":
+          description: List of events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Event"
+    post:
+      operationId: createEvent
+      tags: [events]
+      summary: Create event
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateEventRequest"
+      responses:
+        "201":
+          description: Created event
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Event"
+
+  /events/{id}:
+    get:
+      operationId: getEvent
+      tags: [events]
+      summary: Get event by ID
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "200":
+          description: Event
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Event"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    patch:
+      operationId: updateEventStatus
+      tags: [events]
+      summary: Update event status
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateEventStatusRequest"
+      responses:
+        "200":
+          description: Updated event
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Event"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # ── Odds ─────────────────────────────────────────────────────────────────────
+
+  /odds:
+    get:
+      operationId: listOdds
+      tags: [odds]
+      summary: List odds
+      parameters:
+        - name: eventId
+          in: query
+          schema:
+            type: integer
+        - name: bookmakerId
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of odds
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Odds"
+    post:
+      operationId: upsertOdds
+      tags: [odds]
+      summary: Upsert odds for an outcome
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpsertOddsRequest"
+      responses:
+        "200":
+          description: Upserted odds
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Odds"
+
+  /odds/{id}:
+    delete:
+      operationId: deleteOdds
+      tags: [odds]
+      summary: Delete odds entry
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # ── Opportunities ─────────────────────────────────────────────────────────────
+
+  /opportunities:
+    get:
+      operationId: listOpportunities
+      tags: [opportunities]
+      summary: List arbitrage opportunities
+      parameters:
+        - name: eventId
+          in: query
+          schema:
+            type: integer
+        - name: minProfit
+          in: query
+          description: Minimum profit percentage (e.g. 1.5 means 1.5%)
+          schema:
+            type: number
+      responses:
+        "200":
+          description: List of opportunities
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Opportunity"
+
+  /opportunities/calculate:
+    post:
+      operationId: calculateOpportunities
+      tags: [opportunities]
+      summary: Calculate arbitrage opportunities for all pending events
+      responses:
+        "200":
+          description: Newly detected opportunities
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ArbitrageCalculationResult"
+
+  /opportunities/{id}:
+    get:
+      operationId: getOpportunity
+      tags: [opportunities]
+      summary: Get opportunity by ID
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "200":
+          description: Opportunity
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Opportunity"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
 components:
+  parameters:
+    IdParam:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+
   schemas:
     HealthStatus:
       type: object
@@ -34,3 +416,212 @@ components:
       required:
         - status
 
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+
+    EventStatus:
+      type: string
+      enum: [pending, live, completed, cancelled]
+
+    Outcome:
+      type: string
+      enum: [home, draw, away]
+
+    # ── Sport ──
+
+    Sport:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        slug:
+          type: string
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, name, slug, isActive, createdAt]
+
+    CreateSportRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        slug:
+          type: string
+        isActive:
+          type: boolean
+          default: true
+      required: [name, slug]
+
+    # ── Bookmaker ──
+
+    Bookmaker:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        url:
+          type: string
+          nullable: true
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, name, isActive, createdAt]
+
+    CreateBookmakerRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        url:
+          type: string
+        isActive:
+          type: boolean
+          default: true
+      required: [name]
+
+    # ── Event ──
+
+    Event:
+      type: object
+      properties:
+        id:
+          type: integer
+        sportId:
+          type: integer
+        homeTeam:
+          type: string
+        awayTeam:
+          type: string
+        startsAt:
+          type: string
+          format: date-time
+        status:
+          $ref: "#/components/schemas/EventStatus"
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, sportId, homeTeam, awayTeam, startsAt, status, createdAt]
+
+    CreateEventRequest:
+      type: object
+      properties:
+        sportId:
+          type: integer
+        homeTeam:
+          type: string
+        awayTeam:
+          type: string
+        startsAt:
+          type: string
+          format: date-time
+        status:
+          $ref: "#/components/schemas/EventStatus"
+      required: [sportId, homeTeam, awayTeam, startsAt]
+
+    UpdateEventStatusRequest:
+      type: object
+      properties:
+        status:
+          $ref: "#/components/schemas/EventStatus"
+      required: [status]
+
+    # ── Odds ──
+
+    Odds:
+      type: object
+      properties:
+        id:
+          type: integer
+        eventId:
+          type: integer
+        bookmakerId:
+          type: integer
+        outcome:
+          $ref: "#/components/schemas/Outcome"
+        decimalOdds:
+          type: number
+        updatedAt:
+          type: string
+          format: date-time
+      required: [id, eventId, bookmakerId, outcome, decimalOdds, updatedAt]
+
+    UpsertOddsRequest:
+      type: object
+      properties:
+        eventId:
+          type: integer
+        bookmakerId:
+          type: integer
+        outcome:
+          $ref: "#/components/schemas/Outcome"
+        decimalOdds:
+          type: number
+      required: [eventId, bookmakerId, outcome, decimalOdds]
+
+    # ── Opportunity ──
+
+    StakeDetail:
+      type: object
+      properties:
+        bookmakerId:
+          type: integer
+        odds:
+          type: number
+        stake:
+          type: number
+        payout:
+          type: number
+      required: [bookmakerId, odds, stake, payout]
+
+    OpportunityStakes:
+      type: object
+      properties:
+        home:
+          $ref: "#/components/schemas/StakeDetail"
+        draw:
+          $ref: "#/components/schemas/StakeDetail"
+        away:
+          $ref: "#/components/schemas/StakeDetail"
+      required: [home, away]
+
+    Opportunity:
+      type: object
+      properties:
+        id:
+          type: integer
+        eventId:
+          type: integer
+        profitPercentage:
+          type: number
+        stakes:
+          $ref: "#/components/schemas/OpportunityStakes"
+        calculatedAt:
+          type: string
+          format: date-time
+      required: [id, eventId, profitPercentage, stakes, calculatedAt]
+
+    ArbitrageCalculationResult:
+      type: object
+      properties:
+        found:
+          type: integer
+          description: Number of new opportunities detected
+        opportunities:
+          type: array
+          items:
+            $ref: "#/components/schemas/Opportunity"
+      required: [found, opportunities]
