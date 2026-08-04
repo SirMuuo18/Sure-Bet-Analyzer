@@ -133,3 +133,36 @@ export const fetchRealOdds = () =>
 
 export const seedDemoData = () =>
   http.post<SeedResult>("/seed").then((r) => r.data)
+
+// ─── Predictions ──────────────────────────────────────────────────────────────
+
+export interface OutcomePrediction {
+  outcome: "home" | "draw" | "away"
+  trueProb: number
+  bestOdds: number
+  bestBookmakerId: number
+  ev: number
+  isValue: boolean
+  isStrongValue: boolean
+}
+
+export interface Recommendation {
+  outcome: "home" | "draw" | "away"
+  odds: number
+  bookmakerId: number
+  ev: number
+  confidence: "high" | "medium" | "low"
+}
+
+export interface Prediction {
+  eventId: number
+  homeTeam: string
+  awayTeam: string
+  startsAt: string
+  bookmakerCount: number
+  outcomes: OutcomePrediction[]
+  recommendation: Recommendation | null
+}
+
+export const getPredictions = () =>
+  http.get<Prediction[]>("/predictions").then((r) => r.data)

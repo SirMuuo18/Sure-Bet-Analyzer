@@ -4,6 +4,7 @@ import Opportunities from "./pages/Opportunities"
 import Events from "./pages/Events"
 import Odds from "./pages/Odds"
 import Setup from "./pages/Setup"
+import Predictions from "./pages/Predictions"
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -11,10 +12,11 @@ const queryClient = new QueryClient({
   },
 })
 
-type Tab = "opportunities" | "events" | "odds" | "setup"
+type Tab = "opportunities" | "predictions" | "events" | "odds" | "setup"
 
 const TABS: { id: Tab; label: string }[] = [
   { id: "opportunities", label: "Opportunities" },
+  { id: "predictions", label: "✦ Predictions" },
   { id: "events", label: "Events" },
   { id: "odds", label: "Odds" },
   { id: "setup", label: "Setup" },
@@ -54,6 +56,7 @@ function Layout() {
       <main className="flex-1 overflow-auto">
         <div className="max-w-6xl mx-auto p-8">
           {activeTab === "opportunities" && <Opportunities />}
+          {activeTab === "predictions" && <Predictions />}
           {activeTab === "events" && <Events />}
           {activeTab === "odds" && <Odds />}
           {activeTab === "setup" && <Setup />}
