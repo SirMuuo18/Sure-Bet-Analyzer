@@ -4,6 +4,7 @@ import {
   getPredictions,
   getBookmakers,
   buildAccumulator,
+  smartPickAcca,
   type Prediction,
   type AccumulatorResult,
 } from "../api"
@@ -362,6 +363,8 @@ function BetSlip({
 
 export default function Accumulator() {
   const [selectedPicks, setSelectedPicks] = useState<SelectedPick[]>([])
+  const [smartLoading, setSmartLoading] = useState(false)
+  const [smartResult, setSmartResult] = useState<AccumulatorResult | { message: string } | null>(null)
 
   const { data: predictions = [], isLoading } = useQuery({
     queryKey: ["predictions"],
@@ -396,24 +399,30 @@ export default function Accumulator() {
     setSelectedPicks((prev) => prev.filter((p) => p.eventId !== eventId))
   }
 
-  function handleSmartAcca() {
-    const allPicks: SelectedPick[] = valuePredictions
-      .map((pred) => {
-        const rec = pred.recommendation!
-        const outcome = rec.outcome as Outcome
-        const trueOutcome = pred.outcomes.find((o) => o.outcome === outcome)
-        return {
-          eventId: pred.eventId,
-          homeTeam: pred.homeTeam,
-          awayTeam: pred.awayTeam,
-          outcome,
-          bestOdds: rec.odds,
-          bestBookmakerId: rec.bookmakerId,
-          trueProb: trueOutcome?.trueProb ?? 0,
-          ev: rec.ev,
-        }
-      })
-    setSelectedPicks(allPicks)
+  async function handleSmartAcca() {
+    setSmartLoading(true)
+    setSmartResult(null)
+    try {
+      const res = await smartPickAcca(1000)
+      setSmartResult(res)
+      if ("selections" in res) {
+        const picks: SelectedPick[] = res.selections.map((sel) => ({
+          eventId: sel.eventId,
+          homeTeam: sel.homeTeam,
+          awayTeam: sel.awayTeam,
+          outcome: sel.outcome as Outcome,
+          bestOdds: sel.bestOdds,
+          bestBookmakerId: sel.bestBookmakerId,
+          trueProb: sel.trueProb,
+          ev: (sel.trueProb * sel.bestOdds - 1) * 100,
+        }))
+        setSelectedPicks(picks)
+      }
+    } catch {
+      setSmartResult({ message: "Failed to fetch smart picks" })
+    } finally {
+      setSmartLoading(false)
+    }
   }
 
   return (
@@ -428,21 +437,81 @@ export default function Accumulator() {
         </div>
         <button
           onClick={handleSmartAcca}
-          disabled={valuePredictions.length === 0}
+          disabled={smartLoading || valuePredictions.length === 0}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-sm border transition-all ${
-            valuePredictions.length === 0
+            smartLoading || valuePredictions.length === 0
               ? "border-gray-700 text-gray-600 cursor-not-allowed"
               : "border-yellow-600/50 bg-yellow-500/10 text-yellow-300 hover:bg-yellow-500/20 active:scale-[0.98]"
           }`}
         >
-          ⚡ Smart Acca
-          {valuePredictions.length > 0 && (
+          {smartLoading ? "Building…" : "⚡ Auto-Build Best Acca"}
+          {!smartLoading && valuePredictions.length > 0 && (
             <span className="bg-yellow-600/30 text-yellow-300 rounded-full px-1.5 py-0.5 text-xs">
-              {valuePredictions.length}
+              top 3
             </span>
           )}
         </button>
       </div>
+
+      {/* Smart Picks Result */}
+      {smartResult && (
+        <div className="mb-6 bg-gray-900 rounded-xl border border-gray-800 p-5">
+          {"message" in smartResult ? (
+            <div className="text-gray-400 text-sm">{smartResult.message}</div>
+          ) : (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div className="bg-gray-800/60 rounded-lg p-4">
+                  <div className="text-xs text-gray-500 mb-1">Combined Odds</div>
+                  <div className="text-2xl font-bold text-white font-mono">
+                    {smartResult.combinedOdds.toFixed(2)}x
+                  </div>
+                </div>
+                <div className="bg-gray-800/60 rounded-lg p-4">
+                  <div className="text-xs text-gray-500 mb-1">Win Probability</div>
+                  <div className="text-2xl font-bold text-white">
+                    {(smartResult.combinedProb * 100).toFixed(1)}%
+                  </div>
+                </div>
+                <div className="bg-gray-800/60 rounded-lg p-4">
+                  <div className="text-xs text-gray-500 mb-1">Expected Value</div>
+                  <div className={`text-2xl font-bold font-mono ${smartResult.ev > 0 ? "text-green-400" : "text-red-400"}`}>
+                    {smartResult.ev > 0 ? "+" : ""}{smartResult.ev.toFixed(1)}%
+                  </div>
+                </div>
+                <div className="bg-gray-800/60 rounded-lg p-4">
+                  <div className="text-xs text-gray-500 mb-1">Potential Payout</div>
+                  <div className="text-2xl font-bold text-white">
+                    KES {Math.round(smartResult.potentialReturn).toLocaleString()}
+                  </div>
+                </div>
+              </div>
+              <div className="bg-gray-800/40 rounded-lg p-4 flex items-center gap-4 flex-wrap">
+                <div>
+                  <div className="text-xs text-gray-500 mb-1">Kelly Recommended Stake</div>
+                  <div className="text-lg font-bold text-yellow-400">
+                    KES {Math.round(smartResult.recommendedStake).toLocaleString()}
+                  </div>
+                </div>
+                <div className="ml-auto text-right">
+                  <div className="text-xs text-gray-500 mb-1">Kelly Fraction</div>
+                  <div className="text-sm font-mono text-gray-300">
+                    {(smartResult.kellyFraction * 100).toFixed(1)}%
+                  </div>
+                </div>
+              </div>
+              {!smartResult.isValueBet && (
+                <div className="bg-yellow-900/30 border border-yellow-700/40 rounded-lg p-3 text-yellow-400 text-sm">
+                  ⚠ This acca has negative expected value — consider removing the weakest leg
+                </div>
+              )}
+              <div className="text-xs text-gray-500">
+                Selections loaded into bet slip below — adjust bankroll and rebuild if needed
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Two-column layout */}
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">

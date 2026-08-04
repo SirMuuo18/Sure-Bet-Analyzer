@@ -18,7 +18,7 @@ type Tab = "opportunities" | "predictions" | "accumulator" | "events" | "odds" |
 const TABS: { id: Tab; label: string }[] = [
   { id: "opportunities", label: "Opportunities" },
   { id: "predictions", label: "✦ Predictions" },
-  { id: "accumulator", label: "⚡ Accumulator" },
+  { id: "accumulator", label: "🎯 Accumulator" },
   { id: "events", label: "Events" },
   { id: "odds", label: "Odds" },
   { id: "setup", label: "Setup" },
