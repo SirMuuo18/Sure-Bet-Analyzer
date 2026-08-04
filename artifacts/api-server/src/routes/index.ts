@@ -8,6 +8,7 @@ import opportunitiesRouter from "./opportunities";
 import seedRouter from "./seed";
 import realOddsRouter from "./real-odds";
 import predictionsRouter from "./predictions";
+import accumulatorRouter from "./accumulator";
 
 const router: IRouter = Router();
 
@@ -20,5 +21,6 @@ router.use(opportunitiesRouter);
 router.use(seedRouter);
 router.use(realOddsRouter);
 router.use(predictionsRouter);
+router.use(accumulatorRouter);
 
 export default router;

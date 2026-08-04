@@ -166,3 +166,38 @@ export interface Prediction {
 
 export const getPredictions = () =>
   http.get<Prediction[]>("/predictions").then((r) => r.data)
+
+// ─── Accumulator ──────────────────────────────────────────────────────────────
+
+export interface AccumulatorSelection {
+  eventId: number
+  homeTeam: string
+  awayTeam: string
+  outcome: "home" | "draw" | "away"
+  bestOdds: number
+  bestBookmakerId: number
+  trueProb: number
+}
+
+export interface AccumulatorResult {
+  selections: AccumulatorSelection[]
+  combinedOdds: number
+  combinedProb: number
+  ev: number
+  kellyFraction: number
+  recommendedStake: number
+  potentialReturn: number
+  potentialProfit: number
+  isValueBet: boolean
+}
+
+export const buildAccumulator = (body: {
+  selections: Array<{ eventId: number; outcome: string }>
+  bankroll: number
+}) =>
+  http.post<AccumulatorResult>("/accumulator", body).then((r) => r.data)
+
+export const smartPickAcca = (bankroll: number) =>
+  http
+    .get<AccumulatorResult | { message: string }>("/accumulator/smart-picks", { params: { bankroll } })
+    .then((r) => r.data)
