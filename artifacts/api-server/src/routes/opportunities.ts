@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { eq, and, gte } from "drizzle-orm";
+import { eq, and, gte, desc } from "drizzle-orm";
 import { db, opportunitiesTable, oddsTable, eventsTable } from "@workspace/db";
 import {
   calculateArbitrage,
@@ -27,7 +27,7 @@ router.get("/opportunities", async (req, res) => {
     .select()
     .from(opportunitiesTable)
     .where(conditions.length ? and(...conditions) : undefined)
-    .orderBy(opportunitiesTable.profitPercentage);
+    .orderBy(desc(opportunitiesTable.profitPercentage));
   res.json(opportunities);
 });
 
@@ -45,6 +45,8 @@ router.get("/opportunities/:id", async (req, res) => {
 });
 
 router.post("/opportunities/calculate", async (req, res) => {
+  const bankroll: number = typeof req.body?.bankroll === "number" ? req.body.bankroll : 1000;
+
   // Fetch all pending/live events
   const events = await db
     .select()
@@ -74,7 +76,7 @@ router.post("/opportunities/calculate", async (req, res) => {
     const best = bestOddsPerOutcome(oddsList);
     if (!best) continue;
 
-    const result = calculateArbitrage(best);
+    const result = calculateArbitrage(best, bankroll);
     if (!result) continue;
 
     // Persist the opportunity (replace any prior calculation for this event)

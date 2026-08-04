@@ -40,8 +40,12 @@ router.post("/seed", async (_req, res) => {
 
   // ── Bookmakers ─────────────────────────────────────────────────────────────
   const bookmakerSeeds = [
-    { name: "Betway KE", slug: "betway-ke", url: "https://betway.co.ke" },
-    { name: "Sportpesa", slug: "sportpesa", url: "https://sportpesa.co.ke" },
+    { name: "Sportpesa", url: "https://sportpesa.co.ke" },
+    { name: "Betika", url: "https://betika.com" },
+    { name: "Betway KE", url: "https://betway.co.ke" },
+    { name: "Odibets", url: "https://odibets.com" },
+    { name: "1xBet Kenya", url: "https://1xbet.co.ke" },
+    { name: "Mozzartbet Kenya", url: "https://mozzartbet.co.ke" },
   ];
 
   const bookmakers = [];
@@ -60,7 +64,8 @@ router.post("/seed", async (_req, res) => {
     bookmakers.push(bk);
   }
 
-  const [betway, sportpesa] = bookmakers;
+  const betway = bookmakers.find((b) => b.name === "Betway KE")!;
+  const sportpesa = bookmakers.find((b) => b.name === "Sportpesa")!;
 
   // ── Event ──────────────────────────────────────────────────────────────────
   const startsAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // tomorrow

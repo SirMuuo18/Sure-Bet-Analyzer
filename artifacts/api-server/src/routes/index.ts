@@ -6,6 +6,7 @@ import eventsRouter from "./events";
 import oddsRouter from "./odds";
 import opportunitiesRouter from "./opportunities";
 import seedRouter from "./seed";
+import realOddsRouter from "./real-odds";
 
 const router: IRouter = Router();
 
@@ -16,5 +17,6 @@ router.use(eventsRouter);
 router.use(oddsRouter);
 router.use(opportunitiesRouter);
 router.use(seedRouter);
+router.use(realOddsRouter);
 
 export default router;

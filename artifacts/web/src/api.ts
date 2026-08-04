@@ -121,8 +121,13 @@ export const submitOdds = (body: {
 export const getOpportunities = () =>
   http.get<Opportunity[]>("/opportunities").then((r) => r.data)
 
-export const calculateOpportunities = () =>
-  http.post<CalculateResult>("/opportunities/calculate").then((r) => r.data)
+export const calculateOpportunities = (bankroll?: number) =>
+  http.post<CalculateResult>("/opportunities/calculate", { bankroll }).then((r) => r.data)
+
+// ─── Real Odds ────────────────────────────────────────────────────────────────
+
+export const fetchRealOdds = () =>
+  http.post<{ eventsProcessed: number; oddsStored: number } | { error: string }>("/fetch-real-odds").then((r) => r.data)
 
 // ─── Seed ─────────────────────────────────────────────────────────────────────
 

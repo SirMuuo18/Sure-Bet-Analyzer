@@ -6,6 +6,7 @@ import {
   getEvents,
   getBookmakers,
   seedDemoData,
+  fetchRealOdds,
   type Opportunity,
   type SportEvent,
   type Bookmaker,
@@ -39,11 +40,11 @@ function OpportunityRow({
   const stakeRow = (label: string, detail: { bookmakerId: number; odds: number; stake: number; payout: number }) => (
     <div className="flex items-center gap-3 text-sm">
       <span className="text-gray-500 w-10 shrink-0">{label}</span>
-      <span className="text-white font-mono w-16">${detail.stake.toFixed(2)}</span>
+      <span className="text-white font-mono w-20">KES {detail.stake.toFixed(2)}</span>
       <span className="text-gray-400 text-xs">
         @ {detail.odds.toFixed(2)} — <span className="text-gray-300">{bkName(detail.bookmakerId)}</span>
       </span>
-      <span className="text-gray-600 text-xs ml-auto">payout ${detail.payout.toFixed(2)}</span>
+      <span className="text-gray-600 text-xs ml-auto">payout KES {detail.payout.toFixed(2)}</span>
     </div>
   )
 
@@ -81,6 +82,7 @@ function OpportunityRow({
 export default function Opportunities() {
   const qc = useQueryClient()
   const [msg, setMsg] = useState<{ text: string; type: "success" | "warn" | "error" } | null>(null)
+  const [bankroll, setBankroll] = useState<number>(1000)
 
   const showMsg = (text: string, type: "success" | "warn" | "error") => {
     setMsg({ text, type })
@@ -103,7 +105,7 @@ export default function Opportunities() {
   })
 
   const scanMutation = useMutation({
-    mutationFn: calculateOpportunities,
+    mutationFn: () => calculateOpportunities(bankroll),
     onSuccess: (data) => {
       qc.invalidateQueries({ queryKey: ["opportunities"] })
       if (data.found > 0) {
@@ -124,6 +126,19 @@ export default function Opportunities() {
     onError: () => showMsg("Failed to load demo data.", "error"),
   })
 
+  const realOddsMutation = useMutation({
+    mutationFn: fetchRealOdds,
+    onSuccess: (data) => {
+      if ("error" in data) {
+        showMsg("Configure ODDS_API_KEY in Vercel to fetch real odds", "warn")
+      } else {
+        qc.invalidateQueries()
+        showMsg(`Fetched real odds: ${data.eventsProcessed} events processed, ${data.oddsStored} odds stored.`, "success")
+      }
+    },
+    onError: () => showMsg("Failed to fetch real odds.", "error"),
+  })
+
   const msgColors = {
     success: "bg-green-500/20 text-green-300 border-green-500/30",
     warn: "bg-yellow-500/20 text-yellow-300 border-yellow-500/30",
@@ -139,21 +154,42 @@ export default function Opportunities() {
             Arbitrage opportunities across bookmakers
           </p>
         </div>
-        <div className="flex gap-3">
-          <button
-            onClick={() => seedMutation.mutate()}
-            disabled={seedMutation.isPending}
-            className="px-4 py-2.5 bg-gray-700 hover:bg-gray-600 disabled:opacity-50 text-white font-medium rounded-lg transition-colors text-sm"
-          >
-            {seedMutation.isPending ? "Loading…" : "Load Demo Data"}
-          </button>
-          <button
-            onClick={() => scanMutation.mutate()}
-            disabled={scanMutation.isPending}
-            className="px-5 py-2.5 bg-green-600 hover:bg-green-500 disabled:bg-green-900 disabled:text-green-700 text-white font-semibold rounded-lg transition-colors text-sm"
-          >
-            {scanMutation.isPending ? "Scanning…" : "Scan for Opportunities"}
-          </button>
+        <div className="flex items-center gap-3">
+          <div className="flex flex-col gap-1">
+            <label className="text-xs text-gray-400 font-medium">Bankroll (KES)</label>
+            <input
+              type="number"
+              min={100}
+              step={100}
+              value={bankroll}
+              onChange={(e) => setBankroll(Number(e.target.value))}
+              placeholder="KES 1,000"
+              className="w-32 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm focus:outline-none focus:border-green-500"
+            />
+          </div>
+          <div className="flex gap-3 self-end">
+            <button
+              onClick={() => seedMutation.mutate()}
+              disabled={seedMutation.isPending}
+              className="px-4 py-2.5 bg-gray-700 hover:bg-gray-600 disabled:opacity-50 text-white font-medium rounded-lg transition-colors text-sm"
+            >
+              {seedMutation.isPending ? "Loading…" : "Load Demo Data"}
+            </button>
+            <button
+              onClick={() => realOddsMutation.mutate()}
+              disabled={realOddsMutation.isPending}
+              className="px-4 py-2.5 bg-blue-700 hover:bg-blue-600 disabled:opacity-50 text-white font-medium rounded-lg transition-colors text-sm"
+            >
+              {realOddsMutation.isPending ? "Fetching…" : "Fetch Real Odds"}
+            </button>
+            <button
+              onClick={() => scanMutation.mutate()}
+              disabled={scanMutation.isPending}
+              className="px-5 py-2.5 bg-green-600 hover:bg-green-500 disabled:bg-green-900 disabled:text-green-700 text-white font-semibold rounded-lg transition-colors text-sm"
+            >
+              {scanMutation.isPending ? "Scanning…" : "Scan for Opportunities"}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -183,7 +219,7 @@ export default function Opportunities() {
               <tr className="bg-gray-800/60 text-left">
                 <th className="py-3 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Event</th>
                 <th className="py-3 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Profit</th>
-                <th className="py-3 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Stakes (per $100)</th>
+                <th className="py-3 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Stakes (per KES 1,000)</th>
                 <th className="py-3 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Calculated</th>
               </tr>
             </thead>
