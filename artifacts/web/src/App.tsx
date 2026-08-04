@@ -6,6 +6,7 @@ import Odds from "./pages/Odds"
 import Setup from "./pages/Setup"
 import Predictions from "./pages/Predictions"
 import Accumulator from "./pages/Accumulator"
+import StrategyHub from "./pages/StrategyHub"
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -13,7 +14,7 @@ const queryClient = new QueryClient({
   },
 })
 
-type Tab = "opportunities" | "predictions" | "accumulator" | "events" | "odds" | "setup"
+type Tab = "opportunities" | "predictions" | "accumulator" | "events" | "odds" | "setup" | "strategy"
 
 const TABS: { id: Tab; label: string }[] = [
   { id: "opportunities", label: "Opportunities" },
@@ -22,6 +23,7 @@ const TABS: { id: Tab; label: string }[] = [
   { id: "events", label: "Events" },
   { id: "odds", label: "Odds" },
   { id: "setup", label: "Setup" },
+  { id: "strategy", label: "📊 Strategy" },
 ]
 
 function Layout() {
@@ -63,6 +65,7 @@ function Layout() {
           {activeTab === "events" && <Events />}
           {activeTab === "odds" && <Odds />}
           {activeTab === "setup" && <Setup />}
+          {activeTab === "strategy" && <StrategyHub />}
         </div>
       </main>
     </div>
