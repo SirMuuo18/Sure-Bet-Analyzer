@@ -1,11 +1,12 @@
 import { Router, type IRouter } from "express";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import {
   db,
   sportsTable,
   bookmakersTable,
   eventsTable,
   oddsTable,
+  resultsTable,
 } from "@workspace/db";
 
 const router: IRouter = Router();
@@ -154,6 +155,102 @@ router.post("/fetch-real-odds", async (req, res) => {
   }
 
   res.json({ eventsProcessed, oddsStored });
+});
+
+interface OddsApiScore {
+  name: string;
+  score: string;
+}
+
+interface OddsApiCompletedGame {
+  id: string;
+  sport_key: string;
+  commence_time: string;
+  completed: boolean;
+  home_team: string;
+  away_team: string;
+  scores: OddsApiScore[] | null;
+}
+
+async function fetchScoresForSport(sportKey: string, apiKey: string): Promise<OddsApiCompletedGame[]> {
+  const url =
+    `https://api.the-odds-api.com/v4/sports/${sportKey}/scores/` +
+    `?apiKey=${apiKey}&daysFrom=3`;
+  const resp = await fetch(url);
+  if (!resp.ok) {
+    const text = await resp.text();
+    throw new Error(`The-Odds-API scores error ${resp.status}: ${text}`);
+  }
+  return resp.json() as Promise<OddsApiCompletedGame[]>;
+}
+
+router.post("/fetch-results", async (req, res) => {
+  const apiKey = process.env.ODDS_API_KEY;
+  if (!apiKey) {
+    res.status(400).json({ error: "ODDS_API_KEY not configured" });
+    return;
+  }
+
+  const sportKeys = ["soccer_epl", "soccer_africa_nations"];
+  let allGames: OddsApiCompletedGame[] = [];
+
+  for (const sportKey of sportKeys) {
+    try {
+      const games = await fetchScoresForSport(sportKey, apiKey);
+      allGames = allGames.concat(games);
+    } catch (err) {
+      console.error(`Failed to fetch scores for ${sportKey}:`, err);
+    }
+  }
+
+  let resultsStored = 0;
+
+  for (const game of allGames) {
+    if (!game.completed || !game.scores || game.scores.length < 2) continue;
+
+    const homeScoreEntry = game.scores.find((s) => s.name === game.home_team);
+    const awayScoreEntry = game.scores.find((s) => s.name === game.away_team);
+
+    if (!homeScoreEntry || !awayScoreEntry) continue;
+
+    const homeScore = parseInt(homeScoreEntry.score, 10);
+    const awayScore = parseInt(awayScoreEntry.score, 10);
+
+    if (isNaN(homeScore) || isNaN(awayScore)) continue;
+
+    const completedAt = new Date(game.commence_time);
+
+    try {
+      // Check if already exists
+      const existing = await db
+        .select()
+        .from(resultsTable)
+        .where(
+          and(
+            eq(resultsTable.homeTeam, game.home_team),
+            eq(resultsTable.awayTeam, game.away_team),
+            eq(resultsTable.completedAt, completedAt),
+          ),
+        );
+
+      if (existing.length === 0) {
+        await db.insert(resultsTable).values({
+          homeTeam: game.home_team,
+          awayTeam: game.away_team,
+          homeScore,
+          awayScore,
+          sport: game.sport_key,
+          completedAt,
+        });
+        resultsStored++;
+      }
+    } catch (dbErr) {
+      console.error("DB error storing result:", dbErr);
+      // Table may not exist yet — degrade gracefully
+    }
+  }
+
+  res.json({ resultsStored });
 });
 
 export default router;

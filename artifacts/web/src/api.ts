@@ -129,6 +129,9 @@ export const calculateOpportunities = (bankroll?: number) =>
 export const fetchRealOdds = () =>
   http.post<{ eventsProcessed: number; oddsStored: number } | { error: string }>("/fetch-real-odds").then((r) => r.data)
 
+export const fetchResults = () =>
+  http.post<{ resultsStored: number } | { error: string }>("/fetch-results").then((r) => r.data)
+
 // ─── Seed ─────────────────────────────────────────────────────────────────────
 
 export const seedDemoData = () =>
@@ -136,9 +139,19 @@ export const seedDemoData = () =>
 
 // ─── Predictions ──────────────────────────────────────────────────────────────
 
+export interface TeamForm {
+  homeTeamWinRate: number | null
+  awayTeamWinRate: number | null
+  h2hHomeWins: number
+  h2hAwayWins: number
+  h2hDraws: number
+  dataPoints: number
+}
+
 export interface OutcomePrediction {
   outcome: "home" | "draw" | "away"
   trueProb: number
+  formAdjustedProb: number
   bestOdds: number
   bestBookmakerId: number
   ev: number
@@ -162,6 +175,7 @@ export interface Prediction {
   bookmakerCount: number
   outcomes: OutcomePrediction[]
   recommendation: Recommendation | null
+  form: TeamForm | null
 }
 
 export const getPredictions = () =>
