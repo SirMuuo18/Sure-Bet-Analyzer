@@ -1,21 +1,22 @@
-import { mkdir, copyFile, writeFile, readdir, rename } from "node:fs/promises";
+import { mkdir, copyFile, writeFile, readdir, rename, cp } from "node:fs/promises";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const distVercel = join(root, "artifacts/api-server/dist/vercel");
+const distWeb = join(root, "artifacts/web/dist");
 const outputDir = join(root, ".vercel/output");
 const funcDir = join(outputDir, "functions/api/index.func");
+const staticDir = join(outputDir, "static");
 
+// --- API serverless function ---
 await mkdir(funcDir, { recursive: true });
 
-// Copy all pino workers + handler from dist/vercel/
 const files = await readdir(distVercel);
 for (const file of files) {
   await copyFile(join(distVercel, file), join(funcDir, file));
 }
 
-// Vercel function entry must be named index.mjs
 await rename(join(funcDir, "vercel-handler.mjs"), join(funcDir, "index.mjs"));
 
 await writeFile(
@@ -29,11 +30,19 @@ await writeFile(
   }, null, 2),
 );
 
+// --- Static frontend ---
+await cp(distWeb, staticDir, { recursive: true });
+
+// --- Routes: /api/* → function, everything else → SPA ---
 await writeFile(
   join(outputDir, "config.json"),
   JSON.stringify({
     version: 3,
-    routes: [{ src: "/(.*)", dest: "/api/index" }],
+    routes: [
+      { src: "/api/(.*)", dest: "/api/index" },
+      { handle: "filesystem" },
+      { src: "/(.*)", dest: "/index.html" },
+    ],
   }, null, 2),
 );
 
