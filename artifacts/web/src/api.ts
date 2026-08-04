@@ -43,10 +43,17 @@ export interface Odds {
   decimalOdds: string
 }
 
+export interface StakeDetail {
+  bookmakerId: number
+  odds: number
+  stake: number
+  payout: number
+}
+
 export interface Stakes {
-  home: number
-  draw?: number
-  away: number
+  home: StakeDetail
+  draw?: StakeDetail
+  away: StakeDetail
 }
 
 export interface Opportunity {
@@ -60,6 +67,13 @@ export interface Opportunity {
 export interface CalculateResult {
   found: number
   opportunities: Opportunity[]
+}
+
+export interface SeedResult {
+  sport: Sport
+  bookmakers: Bookmaker[]
+  event: SportEvent
+  oddsCount: number
 }
 
 // ─── Sports ──────────────────────────────────────────────────────────────────
@@ -109,3 +123,8 @@ export const getOpportunities = () =>
 
 export const calculateOpportunities = () =>
   http.post<CalculateResult>("/opportunities/calculate").then((r) => r.data)
+
+// ─── Seed ─────────────────────────────────────────────────────────────────────
+
+export const seedDemoData = () =>
+  http.post<SeedResult>("/seed").then((r) => r.data)

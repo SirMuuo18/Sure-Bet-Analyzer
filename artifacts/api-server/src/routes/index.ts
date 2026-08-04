@@ -5,6 +5,7 @@ import bookmakersRouter from "./bookmakers";
 import eventsRouter from "./events";
 import oddsRouter from "./odds";
 import opportunitiesRouter from "./opportunities";
+import seedRouter from "./seed";
 
 const router: IRouter = Router();
 
@@ -14,5 +15,6 @@ router.use(bookmakersRouter);
 router.use(eventsRouter);
 router.use(oddsRouter);
 router.use(opportunitiesRouter);
+router.use(seedRouter);
 
 export default router;
