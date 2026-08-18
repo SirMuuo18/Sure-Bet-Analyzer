@@ -12,22 +12,22 @@ interface EdgeCardProps {
 
 function EdgeCard({ title, body, example, workaround, workaroundLabel }: EdgeCardProps) {
   return (
-    <div className="rounded-xl border border-gray-800 bg-gray-900 p-5 flex flex-col gap-3">
-      <h3 className="text-base font-bold text-white">{title}</h3>
-      <p className="text-sm text-gray-300 leading-relaxed">{body}</p>
+    <div className="rounded-xl border border-line bg-surface p-5 flex flex-col gap-3">
+      <h3 className="text-base font-bold text-ink">{title}</h3>
+      <p className="text-sm text-ink-muted leading-relaxed">{body}</p>
       {example && (
-        <div className="bg-gray-800/60 rounded-lg px-4 py-3 text-xs text-gray-400 leading-relaxed font-mono whitespace-pre-wrap">
+        <div className="bg-surface-2/60 rounded-lg px-4 py-3 text-xs text-ink-muted leading-relaxed font-mono whitespace-pre-wrap">
           {example}
         </div>
       )}
       {workaround && (
-        <div className="bg-blue-900/20 border border-blue-800/40 rounded-lg px-4 py-3">
+        <div className="bg-accent-dim/60 border border-accent/30 rounded-lg px-4 py-3">
           {workaroundLabel && (
-            <span className="text-xs font-semibold text-blue-400 uppercase tracking-wide block mb-1">
+            <span className="text-xs font-semibold text-accent-strong uppercase tracking-wide block mb-1">
               {workaroundLabel}
             </span>
           )}
-          <p className="text-xs text-blue-200 leading-relaxed">{workaround}</p>
+          <p className="text-xs text-ink-muted leading-relaxed">{workaround}</p>
         </div>
       )}
     </div>
@@ -81,9 +81,9 @@ function OverroundCalculator() {
   }
 
   function overroundBadge(pct: number) {
-    if (pct < 3) return { label: "Excellent (<3%)", cls: "bg-green-500/20 text-green-400 border-green-500/30" }
-    if (pct <= 6) return { label: "Average (3-6%)", cls: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30" }
-    return { label: "Poor (>6%)", cls: "bg-red-500/20 text-red-400 border-red-500/30" }
+    if (pct < 3) return { label: "Excellent (<3%)", cls: "bg-positive-dim text-positive border-positive/30" }
+    if (pct <= 6) return { label: "Average (3-6%)", cls: "bg-watch-dim text-watch border-watch/30" }
+    return { label: "Poor (>6%)", cls: "bg-risk-dim text-risk border-risk/30" }
   }
 
   const rows = result
@@ -97,10 +97,10 @@ function OverroundCalculator() {
     : []
 
   return (
-    <div className="rounded-xl border border-gray-800 bg-gray-900 p-5 flex flex-col gap-4">
+    <div className="rounded-xl border border-line bg-surface p-5 flex flex-col gap-4">
       <div>
-        <h3 className="text-base font-bold text-white mb-0.5">Calculator A — Overround Analyzer</h3>
-        <p className="text-xs text-gray-500">Enter decimal odds to measure the bookmaker's built-in margin.</p>
+        <h3 className="text-base font-bold text-ink mb-0.5">Calculator A — Overround Analyzer</h3>
+        <p className="text-xs text-ink-muted">Enter decimal odds to measure the bookmaker's built-in margin.</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -110,7 +110,7 @@ function OverroundCalculator() {
           { label: "Away Odds", value: awayOdds, setter: setAwayOdds, placeholder: "e.g. 3.60" },
         ].map(({ label, value, setter, placeholder }) => (
           <div key={label}>
-            <label className="text-xs text-gray-400 block mb-1.5">{label}</label>
+            <label className="text-xs text-ink-muted block mb-1.5">{label}</label>
             <input
               type="number"
               min="1.01"
@@ -118,7 +118,7 @@ function OverroundCalculator() {
               value={value}
               onChange={(e) => setter(e.target.value)}
               placeholder={placeholder}
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-green-600 placeholder-gray-600"
+              className="w-full bg-surface-2 border border-line-strong rounded-lg px-3 py-2 text-ink text-sm focus:outline-none focus:border-accent placeholder-ink-faint"
             />
           </div>
         ))}
@@ -127,8 +127,8 @@ function OverroundCalculator() {
       {result && (
         <div className="flex flex-col gap-3">
           <div className="flex items-center gap-3 flex-wrap">
-            <span className="text-sm text-gray-400">Overround:</span>
-            <span className="text-lg font-bold text-white font-mono">
+            <span className="text-sm text-ink-muted">Overround:</span>
+            <span className="text-lg font-bold text-ink font-mono">
               {result.overround.toFixed(2)}%
             </span>
             {(() => {
@@ -141,18 +141,18 @@ function OverroundCalculator() {
             })()}
           </div>
 
-          <div className="text-xs text-gray-500">
+          <div className="text-xs text-ink-muted">
             Implied probabilities sum to{" "}
-            <span className="text-white font-semibold">{(result.sumImplied * 100).toFixed(2)}%</span>
+            <span className="text-ink font-semibold">{(result.sumImplied * 100).toFixed(2)}%</span>
             {" "}(bookmaker takes the {result.overround.toFixed(2)}% excess)
           </div>
 
-          <div className="bg-gray-800/50 rounded-lg overflow-hidden">
+          <div className="bg-surface-2/50 rounded-lg overflow-hidden">
             <table className="w-full">
               <thead>
                 <tr>
                   {["Outcome", "Quoted Odds", "Fair Odds", "Margin"].map((h) => (
-                    <th key={h} className="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wide text-left bg-gray-800 border-b border-gray-700">
+                    <th key={h} className="px-3 py-2 text-xs font-semibold text-ink-muted uppercase tracking-wide text-left bg-surface-2 border-b border-line-strong">
                       {h}
                     </th>
                   ))}
@@ -160,11 +160,11 @@ function OverroundCalculator() {
               </thead>
               <tbody>
                 {rows.map((row) => (
-                  <tr key={row.label} className="border-b border-gray-800 last:border-0">
-                    <td className="px-3 py-2 text-xs text-gray-300">{row.label}</td>
-                    <td className="px-3 py-2 text-xs text-white font-mono">{row.quoted.toFixed(2)}</td>
-                    <td className="px-3 py-2 text-xs text-green-400 font-mono">{row.fair.toFixed(2)}</td>
-                    <td className="px-3 py-2 text-xs text-red-400 font-mono">
+                  <tr key={row.label} className="border-b border-line last:border-0">
+                    <td className="px-3 py-2 text-xs text-ink-muted">{row.label}</td>
+                    <td className="px-3 py-2 text-xs text-ink font-mono">{row.quoted.toFixed(2)}</td>
+                    <td className="px-3 py-2 text-xs text-positive font-mono">{row.fair.toFixed(2)}</td>
+                    <td className="px-3 py-2 text-xs text-risk font-mono">
                       {row.margin < 0 ? "" : "+"}{row.margin.toFixed(2)}%
                     </td>
                   </tr>
@@ -173,14 +173,14 @@ function OverroundCalculator() {
             </table>
           </div>
 
-          <p className="text-xs text-gray-500 italic">
+          <p className="text-xs text-ink-muted italic">
             Tip: Compare the same fixture across Betway, Sportpesa, and Betika — choose the lowest overround.
           </p>
         </div>
       )}
 
       {!canCalculate && (homeOdds || awayOdds) && (
-        <p className="text-xs text-red-400">Enter valid decimal odds greater than 1.01 for Home and Away.</p>
+        <p className="text-xs text-risk">Enter valid decimal odds greater than 1.01 for Home and Away.</p>
       )}
     </div>
   )
@@ -223,10 +223,10 @@ function KellyCalculator() {
   }
 
   return (
-    <div className="rounded-xl border border-gray-800 bg-gray-900 p-5 flex flex-col gap-4">
+    <div className="rounded-xl border border-line bg-surface p-5 flex flex-col gap-4">
       <div>
-        <h3 className="text-base font-bold text-white mb-0.5">Calculator B — Kelly Criterion Staking</h3>
-        <p className="text-xs text-gray-500">Optimal bet sizing based on your estimated edge.</p>
+        <h3 className="text-base font-bold text-ink mb-0.5">Calculator B — Kelly Criterion Staking</h3>
+        <p className="text-xs text-ink-muted">Optimal bet sizing based on your estimated edge.</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -236,7 +236,7 @@ function KellyCalculator() {
           { label: "Bankroll (KES)", value: bankroll, setter: setBankroll, placeholder: "e.g. 10000", min: "100" },
         ].map(({ label, value, setter, placeholder, min, max }) => (
           <div key={label}>
-            <label className="text-xs text-gray-400 block mb-1.5">{label}</label>
+            <label className="text-xs text-ink-muted block mb-1.5">{label}</label>
             <input
               type="number"
               min={min}
@@ -245,7 +245,7 @@ function KellyCalculator() {
               value={value}
               onChange={(e) => setter(e.target.value)}
               placeholder={placeholder}
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-green-600 placeholder-gray-600"
+              className="w-full bg-surface-2 border border-line-strong rounded-lg px-3 py-2 text-ink text-sm focus:outline-none focus:border-accent placeholder-ink-faint"
             />
           </div>
         ))}
@@ -254,45 +254,45 @@ function KellyCalculator() {
       {result && (
         <div className="flex flex-col gap-3">
           {result.negative && (
-            <div className="bg-red-900/30 border border-red-700/40 rounded-lg px-4 py-3 text-red-400 text-sm font-semibold">
+            <div className="bg-risk-dim border border-risk/30 rounded-lg px-4 py-3 text-risk text-sm font-semibold">
               No edge — these odds and probability produce negative expected value. Do not bet.
             </div>
           )}
           {!result.negative && result.highRisk && (
-            <div className="bg-orange-900/30 border border-orange-700/40 rounded-lg px-4 py-3 text-orange-400 text-sm font-semibold">
+            <div className="bg-watch-dim border border-watch/30 rounded-lg px-4 py-3 text-watch text-sm font-semibold">
               HIGH RISK — Kelly suggests {result.kellyPct.toFixed(1)}% stake. Odds may not match your true probability.
             </div>
           )}
           {!result.negative && (
             <div className="grid grid-cols-2 gap-3">
-              <div className="bg-gray-800/60 rounded-lg px-4 py-3">
-                <div className="text-xs text-gray-500 mb-1">Full Kelly</div>
-                <div className="text-xl font-bold text-white font-mono">{result.kellyPct.toFixed(2)}%</div>
-                <div className="text-xs text-gray-600 mt-0.5">aggressive — not recommended</div>
+              <div className="bg-surface-2/60 rounded-lg px-4 py-3">
+                <div className="text-xs text-ink-muted mb-1">Full Kelly</div>
+                <div className="text-xl font-bold text-ink font-mono">{result.kellyPct.toFixed(2)}%</div>
+                <div className="text-xs text-ink-faint mt-0.5">aggressive — not recommended</div>
               </div>
-              <div className="bg-green-900/30 border border-green-700/30 rounded-lg px-4 py-3">
-                <div className="text-xs text-gray-500 mb-1">Quarter Kelly (recommended)</div>
-                <div className="text-xl font-bold text-green-400 font-mono">{result.quarterKellyPct.toFixed(2)}%</div>
-                <div className="text-xs text-gray-600 mt-0.5">pro standard</div>
+              <div className="bg-positive-dim border border-positive/30 rounded-lg px-4 py-3">
+                <div className="text-xs text-ink-muted mb-1">Quarter Kelly (recommended)</div>
+                <div className="text-xl font-bold text-positive font-mono">{result.quarterKellyPct.toFixed(2)}%</div>
+                <div className="text-xs text-ink-faint mt-0.5">pro standard</div>
               </div>
-              <div className="bg-gray-800/60 rounded-lg px-4 py-3">
-                <div className="text-xs text-gray-500 mb-1">Recommended Stake (KES)</div>
-                <div className="text-xl font-bold text-yellow-400 font-mono">
+              <div className="bg-surface-2/60 rounded-lg px-4 py-3">
+                <div className="text-xs text-ink-muted mb-1">Recommended Stake (KES)</div>
+                <div className="text-xl font-bold text-watch font-mono">
                   {result.stake.toLocaleString("en-KE", { maximumFractionDigits: 2 })}
                 </div>
               </div>
-              <div className="bg-gray-800/60 rounded-lg px-4 py-3">
-                <div className="text-xs text-gray-500 mb-1">Potential Profit (KES)</div>
-                <div className="text-xl font-bold text-green-400 font-mono">
+              <div className="bg-surface-2/60 rounded-lg px-4 py-3">
+                <div className="text-xs text-ink-muted mb-1">Potential Profit (KES)</div>
+                <div className="text-xl font-bold text-positive font-mono">
                   {result.potentialProfit.toLocaleString("en-KE", { maximumFractionDigits: 2 })}
                 </div>
               </div>
             </div>
           )}
           {!result.negative && (
-            <div className="text-xs text-gray-500 leading-relaxed bg-gray-800/40 rounded-lg px-4 py-3">
+            <div className="text-xs text-ink-muted leading-relaxed bg-surface-2/40 rounded-lg px-4 py-3">
               Full Kelly is aggressive and can cause large drawdowns. Quarter Kelly is what professional bettors use — slower bankroll growth but protects against ruin. Payout if won:{" "}
-              <span className="text-white font-semibold">
+              <span className="text-ink font-semibold">
                 KES {result.potentialPayout.toLocaleString("en-KE", { maximumFractionDigits: 2 })}
               </span>
             </div>
@@ -301,7 +301,7 @@ function KellyCalculator() {
       )}
 
       {!valid && (prob || odds || bankroll) && (
-        <p className="text-xs text-red-400">Enter valid values: probability 1-99%, odds &gt;1.01, bankroll &gt;0.</p>
+        <p className="text-xs text-risk">Enter valid values: probability 1-99%, odds &gt;1.01, bankroll &gt;0.</p>
       )}
     </div>
   )
@@ -320,10 +320,10 @@ function CLVCalculator() {
   const clv = valid ? ((b / c) - 1) * 100 : null
 
   return (
-    <div className="rounded-xl border border-gray-800 bg-gray-900 p-5 flex flex-col gap-4">
+    <div className="rounded-xl border border-line bg-surface p-5 flex flex-col gap-4">
       <div>
-        <h3 className="text-base font-bold text-white mb-0.5">Calculator C — Closing Line Value (CLV) Tracker</h3>
-        <p className="text-xs text-gray-500">Did you beat the market? Compare your bet odds to the final odds at kickoff.</p>
+        <h3 className="text-base font-bold text-ink mb-0.5">Calculator C — Closing Line Value (CLV) Tracker</h3>
+        <p className="text-xs text-ink-muted">Did you beat the market? Compare your bet odds to the final odds at kickoff.</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -332,7 +332,7 @@ function CLVCalculator() {
           { label: "Final Closing Odds (at kickoff)", value: closingOdds, setter: setClosingOdds, placeholder: "e.g. 2.05" },
         ].map(({ label, value, setter, placeholder }) => (
           <div key={label}>
-            <label className="text-xs text-gray-400 block mb-1.5">{label}</label>
+            <label className="text-xs text-ink-muted block mb-1.5">{label}</label>
             <input
               type="number"
               min="1.01"
@@ -340,7 +340,7 @@ function CLVCalculator() {
               value={value}
               onChange={(e) => setter(e.target.value)}
               placeholder={placeholder}
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-green-600 placeholder-gray-600"
+              className="w-full bg-surface-2 border border-line-strong rounded-lg px-3 py-2 text-ink text-sm focus:outline-none focus:border-accent placeholder-ink-faint"
             />
           </div>
         ))}
@@ -351,34 +351,34 @@ function CLVCalculator() {
           <div
             className={`rounded-lg px-5 py-4 border ${
               clv >= 0
-                ? "bg-green-900/25 border-green-700/40"
-                : "bg-orange-900/25 border-orange-700/40"
+                ? "bg-positive-dim border-positive/30"
+                : "bg-watch-dim border-watch/30"
             }`}
           >
             <div className="flex items-center gap-3 flex-wrap">
-              <span className="text-2xl font-bold font-mono text-white">
+              <span className="text-2xl font-bold font-mono text-ink">
                 {clv >= 0 ? "+" : ""}{clv.toFixed(2)}% CLV
               </span>
               {clv >= 0 ? (
-                <span className="text-green-400 text-sm font-semibold">
+                <span className="text-positive text-sm font-semibold">
                   You beat the closing line — this is a professionally good bet.
                 </span>
               ) : (
-                <span className="text-orange-400 text-sm font-semibold">
+                <span className="text-watch text-sm font-semibold">
                   You got worse odds than the market settled at.
                 </span>
               )}
             </div>
           </div>
 
-          <div className="bg-gray-800/40 rounded-lg px-4 py-3 text-xs text-gray-400 leading-relaxed">
+          <div className="bg-surface-2/40 rounded-lg px-4 py-3 text-xs text-ink-muted leading-relaxed">
             Professional bettors track CLV religiously. If you consistently beat the closing line (positive CLV), you have a long-term edge regardless of short-term win/loss results. The closing price is the sharpest consensus — if you got better, you acted on real information.
           </div>
         </div>
       )}
 
       {!valid && (betOdds || closingOdds) && (
-        <p className="text-xs text-red-400">Enter valid decimal odds greater than 1.01 for both fields.</p>
+        <p className="text-xs text-risk">Enter valid decimal odds greater than 1.01 for both fields.</p>
       )}
     </div>
   )
@@ -395,13 +395,16 @@ interface StepProps {
   color: StepColor
 }
 
+// A single neutral treatment for every step — this is an ordered sequence,
+// not distinct categories, so the step number already carries identity.
+const NEUTRAL_STEP = { bg: "bg-surface", border: "border-line", num: "text-accent-strong" }
 const STEP_COLORS: Record<StepColor, { bg: string; border: string; num: string }> = {
-  blue:   { bg: "bg-blue-900/20",   border: "border-blue-800/40",   num: "text-blue-400" },
-  green:  { bg: "bg-green-900/20",  border: "border-green-800/40",  num: "text-green-400" },
-  yellow: { bg: "bg-yellow-900/20", border: "border-yellow-800/40", num: "text-yellow-400" },
-  purple: { bg: "bg-purple-900/20", border: "border-purple-800/40", num: "text-purple-400" },
-  orange: { bg: "bg-orange-900/20", border: "border-orange-800/40", num: "text-orange-400" },
-  gray:   { bg: "bg-gray-800/40",   border: "border-gray-700/60",   num: "text-gray-400" },
+  blue: NEUTRAL_STEP,
+  green: NEUTRAL_STEP,
+  yellow: NEUTRAL_STEP,
+  purple: NEUTRAL_STEP,
+  orange: NEUTRAL_STEP,
+  gray: NEUTRAL_STEP,
 }
 
 function PlaybookStep({ number, title, body, color }: StepProps) {
@@ -410,8 +413,8 @@ function PlaybookStep({ number, title, body, color }: StepProps) {
     <div className={`rounded-xl border ${c.border} ${c.bg} flex gap-4 px-5 py-4`}>
       <div className={`text-3xl font-black font-mono shrink-0 leading-tight mt-0.5 ${c.num}`}>{number}</div>
       <div>
-        <h4 className="text-sm font-bold text-white mb-1">{title}</h4>
-        <p className="text-sm text-gray-300 leading-relaxed">{body}</p>
+        <h4 className="text-sm font-bold text-ink mb-1">{title}</h4>
+        <p className="text-sm text-ink-muted leading-relaxed">{body}</p>
       </div>
     </div>
   )
@@ -424,8 +427,8 @@ export default function StrategyHub() {
     <div className="space-y-12">
       {/* Page header */}
       <div>
-        <h2 className="text-2xl font-bold text-white">Strategy Hub</h2>
-        <p className="text-gray-500 text-sm mt-1">
+        <h2 className="text-2xl font-bold text-ink">Strategy Hub</h2>
+        <p className="text-ink-muted text-sm mt-1">
           How bookmakers build their edge — and every mathematical tool to counter it.
         </p>
       </div>
@@ -433,8 +436,8 @@ export default function StrategyHub() {
       {/* Section 1: Bookmaker Edge */}
       <section>
         <div className="flex items-center gap-3 mb-5">
-          <div className="w-1 h-6 rounded-full bg-red-500 shrink-0" />
-          <h2 className="text-lg font-bold text-white">How Bookmakers Keep Their Edge</h2>
+          <div className="w-1 h-6 rounded-full bg-risk shrink-0" />
+          <h2 className="text-lg font-bold text-ink">How Bookmakers Keep Their Edge</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <EdgeCard
@@ -470,10 +473,10 @@ export default function StrategyHub() {
       {/* Section 2: Calculators */}
       <section>
         <div className="flex items-center gap-3 mb-5">
-          <div className="w-1 h-6 rounded-full bg-green-500 shrink-0" />
-          <h2 className="text-lg font-bold text-white">Interactive Strategy Calculators</h2>
+          <div className="w-1 h-6 rounded-full bg-positive shrink-0" />
+          <h2 className="text-lg font-bold text-ink">Interactive Strategy Calculators</h2>
         </div>
-        <p className="text-sm text-gray-500 mb-5">
+        <p className="text-sm text-ink-muted mb-5">
           All calculations run client-side — no data is sent to any server.
         </p>
         <div className="flex flex-col gap-5">
@@ -486,10 +489,10 @@ export default function StrategyHub() {
       {/* Section 3: Playbook */}
       <section>
         <div className="flex items-center gap-3 mb-5">
-          <div className="w-1 h-6 rounded-full bg-yellow-500 shrink-0" />
-          <h2 className="text-lg font-bold text-white">The Winning Playbook</h2>
+          <div className="w-1 h-6 rounded-full bg-watch shrink-0" />
+          <h2 className="text-lg font-bold text-ink">The Winning Playbook</h2>
         </div>
-        <p className="text-sm text-gray-500 mb-5">
+        <p className="text-sm text-ink-muted mb-5">
           A step-by-step workflow for consistent, mathematically sound betting.
         </p>
         <div className="flex flex-col gap-3">

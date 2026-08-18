@@ -42,9 +42,9 @@ function formatDate(iso: string) {
 }
 
 function outcomeColor(outcome: Outcome) {
-  if (outcome === "home") return "text-blue-400"
-  if (outcome === "draw") return "text-yellow-400"
-  return "text-purple-400"
+  if (outcome === "home") return "text-accent-strong"
+  if (outcome === "draw") return "text-ink-muted"
+  return "text-ink"
 }
 
 // Live math computed in the browser (mirrors backend Kelly formula)
@@ -97,32 +97,32 @@ function PickCard({
     <div
       className={`rounded-xl border transition-all ${
         isSelected
-          ? "bg-green-900/20 border-green-600/50"
-          : "bg-gray-900 border-gray-800 hover:border-gray-700"
+          ? "bg-positive-dim border-positive/30"
+          : "bg-surface border-line hover:border-line-strong"
       }`}
     >
       <div className="px-4 py-3 flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
-          <div className="text-sm font-semibold text-white truncate">
+          <div className="text-sm font-semibold text-ink truncate">
             {prediction.homeTeam} vs {prediction.awayTeam}
           </div>
-          <div className="text-xs text-gray-500 mt-0.5">{formatDate(prediction.startsAt)}</div>
+          <div className="text-xs text-ink-muted mt-0.5">{formatDate(prediction.startsAt)}</div>
           <div className="flex items-center gap-2 mt-2 flex-wrap">
             <span className={`text-xs font-semibold ${outcomeColor(outcome)}`}>
               {OUTCOME_LABELS[outcome]}
             </span>
-            <span className="text-gray-400 text-xs font-mono font-medium">
+            <span className="text-ink-muted text-xs font-mono font-medium">
               {rec.odds.toFixed(2)}
             </span>
-            <span className="text-xs text-gray-500">
+            <span className="text-xs text-ink-muted">
               {(trueProb * 100).toFixed(1)}% prob
             </span>
             <span
-              className="text-xs font-semibold px-1.5 py-0.5 rounded bg-green-500/20 text-green-400"
+              className="text-xs font-semibold px-1.5 py-0.5 rounded bg-positive/20 text-positive"
             >
               +{rec.ev.toFixed(1)}% EV
             </span>
-            <span className="text-xs text-gray-600 truncate">
+            <span className="text-xs text-ink-faint truncate">
               {bookmakersMap[rec.bookmakerId] ?? `#${rec.bookmakerId}`}
             </span>
           </div>
@@ -131,7 +131,7 @@ function PickCard({
           {isSelected ? (
             <button
               onClick={() => onRemove(prediction.eventId)}
-              className="text-xs px-3 py-1.5 rounded-lg bg-red-900/40 text-red-400 border border-red-800/50 hover:bg-red-900/60 transition-colors font-medium"
+              className="text-xs px-3 py-1.5 rounded-lg bg-risk-dim text-risk border border-risk/30 hover:bg-risk/25 transition-colors font-medium"
             >
               Remove
             </button>
@@ -149,7 +149,7 @@ function PickCard({
                   ev: rec.ev,
                 })
               }
-              className="text-xs px-3 py-1.5 rounded-lg bg-green-700/30 text-green-300 border border-green-700/40 hover:bg-green-700/50 transition-colors font-medium"
+              className="text-xs px-3 py-1.5 rounded-lg bg-positive-dim text-positive border border-positive/30 hover:bg-positive/25 transition-colors font-medium"
             >
               + Add
             </button>
@@ -201,10 +201,10 @@ function BetSlip({
   const display = result ?? liveStats
 
   return (
-    <div className="bg-gray-900 rounded-xl border border-gray-800 flex flex-col overflow-hidden">
-      <div className="px-5 py-4 border-b border-gray-800">
-        <h3 className="text-base font-bold text-white">Bet Slip</h3>
-        <p className="text-xs text-gray-500 mt-0.5">
+    <div className="bg-surface rounded-xl border border-line flex flex-col overflow-hidden">
+      <div className="px-5 py-4 border-b border-line">
+        <h3 className="text-base font-bold text-ink">Bet Slip</h3>
+        <p className="text-xs text-ink-muted mt-0.5">
           {picks.length === 0
             ? "Add picks from the left panel"
             : `${picks.length} selection${picks.length !== 1 ? "s" : ""}`}
@@ -213,33 +213,33 @@ function BetSlip({
 
       {/* Selected picks */}
       {picks.length === 0 ? (
-        <div className="px-5 py-8 text-center text-gray-600 text-sm">
+        <div className="px-5 py-8 text-center text-ink-faint text-sm">
           No picks selected yet
         </div>
       ) : (
-        <div className="px-4 py-3 space-y-2 border-b border-gray-800">
+        <div className="px-4 py-3 space-y-2 border-b border-line">
           {picks.map((p) => (
             <div
               key={p.eventId}
               className="flex items-center justify-between gap-2 py-1.5"
             >
               <div className="flex-1 min-w-0">
-                <div className="text-xs font-medium text-white truncate">
+                <div className="text-xs font-medium text-ink truncate">
                   {p.homeTeam} vs {p.awayTeam}
                 </div>
                 <div className="flex items-center gap-1.5 mt-0.5">
                   <span className={`text-xs font-semibold ${outcomeColor(p.outcome)}`}>
                     {OUTCOME_LABELS[p.outcome]}
                   </span>
-                  <span className="text-xs text-gray-400 font-mono">{p.bestOdds.toFixed(2)}</span>
-                  <span className="text-xs text-gray-600">
+                  <span className="text-xs text-ink-muted font-mono">{p.bestOdds.toFixed(2)}</span>
+                  <span className="text-xs text-ink-faint">
                     {bookmakersMap[p.bestBookmakerId] ?? `#${p.bestBookmakerId}`}
                   </span>
                 </div>
               </div>
               <button
                 onClick={() => onRemove(p.eventId)}
-                className="text-gray-600 hover:text-red-400 transition-colors text-sm shrink-0 px-1"
+                className="text-ink-faint hover:text-risk transition-colors text-sm shrink-0 px-1"
                 title="Remove"
               >
                 ✕
@@ -251,15 +251,15 @@ function BetSlip({
 
       {/* Stats */}
       {display && picks.length >= 1 && (
-        <div className="px-5 py-4 space-y-3 border-b border-gray-800">
+        <div className="px-5 py-4 space-y-3 border-b border-line">
           {/* EV badge */}
           <div className="flex justify-center">
             {display.ev > 0 ? (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-green-500/15 border border-green-500/30 text-green-400 font-semibold text-sm">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-positive/15 border border-positive/30 text-positive font-semibold text-sm">
                 VALUE ACCA ✓ &nbsp; +{display.ev.toFixed(2)}% EV
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-orange-500/15 border border-orange-500/30 text-orange-400 font-semibold text-sm">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-watch-dim border border-watch/30 text-watch font-semibold text-sm">
                 ⚠ Low Edge — consider removing weak picks
               </span>
             )}
@@ -267,15 +267,15 @@ function BetSlip({
 
           {/* Combined stats grid */}
           <div className="grid grid-cols-2 gap-2">
-            <div className="bg-gray-800/60 rounded-lg px-3 py-2.5">
-              <div className="text-xs text-gray-500 mb-1">Combined Odds</div>
-              <div className="text-xl font-bold text-white">
+            <div className="bg-surface-2/60 rounded-lg px-3 py-2.5">
+              <div className="text-xs text-ink-muted mb-1">Combined Odds</div>
+              <div className="text-xl font-bold text-ink">
                 {display.combinedOdds.toFixed(2)}x
               </div>
             </div>
-            <div className="bg-gray-800/60 rounded-lg px-3 py-2.5">
-              <div className="text-xs text-gray-500 mb-1">Combined Prob</div>
-              <div className="text-xl font-bold text-white">
+            <div className="bg-surface-2/60 rounded-lg px-3 py-2.5">
+              <div className="text-xs text-ink-muted mb-1">Combined Prob</div>
+              <div className="text-xl font-bold text-ink">
                 {(display.combinedProb * 100).toFixed(2)}%
               </div>
             </div>
@@ -285,9 +285,9 @@ function BetSlip({
 
       {/* Bankroll + stake */}
       {picks.length >= 1 && (
-        <div className="px-5 py-4 space-y-3 border-b border-gray-800">
+        <div className="px-5 py-4 space-y-3 border-b border-line">
           <div>
-            <label className="text-xs text-gray-400 block mb-1.5">Bankroll (KES)</label>
+            <label className="text-xs text-ink-muted block mb-1.5">Bankroll (KES)</label>
             <input
               type="number"
               min={100}
@@ -297,32 +297,32 @@ function BetSlip({
                 setBankroll(Number(e.target.value))
                 setResult(null)
               }}
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-green-600"
+              className="w-full bg-surface-2 border border-line-strong rounded-lg px-3 py-2 text-ink text-sm focus:outline-none focus:border-accent"
             />
           </div>
 
           {display && (
             <div className="space-y-2">
               <div className="flex justify-between items-center">
-                <span className="text-xs text-gray-400">Kelly Stake</span>
-                <span className="text-sm font-semibold text-white">
+                <span className="text-xs text-ink-muted">Kelly Stake</span>
+                <span className="text-sm font-semibold text-ink">
                   KES {display.recommendedStake.toFixed(2)}
-                  <span className="text-xs text-gray-500 ml-1">
+                  <span className="text-xs text-ink-muted ml-1">
                     ({(display.kellyFraction * 100).toFixed(1)}%)
                   </span>
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-xs text-gray-400">Potential Return</span>
-                <span className="text-sm font-medium text-gray-200">
+                <span className="text-xs text-ink-muted">Potential Return</span>
+                <span className="text-sm font-medium text-ink">
                   KES {display.potentialReturn.toFixed(2)}
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-xs text-gray-400">Potential Profit</span>
+                <span className="text-xs text-ink-muted">Potential Profit</span>
                 <span
                   className={`text-sm font-semibold ${
-                    display.potentialProfit >= 0 ? "text-green-400" : "text-red-400"
+                    display.potentialProfit >= 0 ? "text-positive" : "text-risk"
                   }`}
                 >
                   KES {display.potentialProfit.toFixed(2)}
@@ -340,19 +340,19 @@ function BetSlip({
           disabled={picks.length < 2 || loading}
           className={`w-full py-2.5 rounded-lg font-semibold text-sm transition-all ${
             picks.length < 2
-              ? "bg-gray-800 text-gray-600 cursor-not-allowed"
+              ? "bg-surface-2 text-ink-faint cursor-not-allowed"
               : loading
-              ? "bg-green-700/50 text-green-400 cursor-wait"
-              : "bg-green-600 hover:bg-green-500 text-white active:scale-[0.98]"
+              ? "bg-positive-dim text-positive cursor-wait"
+              : "bg-accent hover:bg-accent-strong text-canvas active:scale-[0.98]"
           }`}
         >
           {loading ? "Building…" : "BUILD ACCUMULATOR"}
         </button>
         {picks.length < 2 && picks.length > 0 && (
-          <p className="text-center text-xs text-gray-600 mt-2">Add at least 2 picks</p>
+          <p className="text-center text-xs text-ink-faint mt-2">Add at least 2 picks</p>
         )}
         {error && (
-          <p className="text-center text-xs text-red-400 mt-2">{error}</p>
+          <p className="text-center text-xs text-risk mt-2">{error}</p>
         )}
       </div>
     </div>
@@ -430,8 +430,8 @@ export default function Accumulator() {
       {/* Page header */}
       <div className="mb-6 flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <h2 className="text-2xl font-bold text-white">Accumulator Builder</h2>
-          <p className="text-gray-500 text-sm mt-1">
+          <h2 className="text-2xl font-bold text-ink">Accumulator Builder</h2>
+          <p className="text-ink-muted text-sm mt-1">
             Combine value bets into a multi-bet — Kelly Criterion stake sizing
           </p>
         </div>
@@ -440,13 +440,13 @@ export default function Accumulator() {
           disabled={smartLoading || valuePredictions.length === 0}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-sm border transition-all ${
             smartLoading || valuePredictions.length === 0
-              ? "border-gray-700 text-gray-600 cursor-not-allowed"
-              : "border-yellow-600/50 bg-yellow-500/10 text-yellow-300 hover:bg-yellow-500/20 active:scale-[0.98]"
+              ? "border-line-strong text-ink-faint cursor-not-allowed"
+              : "border-watch/30 bg-watch/10 text-watch hover:bg-watch/20 active:scale-[0.98]"
           }`}
         >
           {smartLoading ? "Building…" : "⚡ Auto-Build Best Acca"}
           {!smartLoading && valuePredictions.length > 0 && (
-            <span className="bg-yellow-600/30 text-yellow-300 rounded-full px-1.5 py-0.5 text-xs">
+            <span className="bg-watch-dim text-watch rounded-full px-1.5 py-0.5 text-xs">
               top 3
             </span>
           )}
@@ -455,57 +455,57 @@ export default function Accumulator() {
 
       {/* Smart Picks Result */}
       {smartResult && (
-        <div className="mb-6 bg-gray-900 rounded-xl border border-gray-800 p-5">
+        <div className="mb-6 bg-surface rounded-xl border border-line p-5">
           {"message" in smartResult ? (
-            <div className="text-gray-400 text-sm">{smartResult.message}</div>
+            <div className="text-ink-muted text-sm">{smartResult.message}</div>
           ) : (
             <div className="space-y-4">
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div className="bg-gray-800/60 rounded-lg p-4">
-                  <div className="text-xs text-gray-500 mb-1">Combined Odds</div>
-                  <div className="text-2xl font-bold text-white font-mono">
+                <div className="bg-surface-2/60 rounded-lg p-4">
+                  <div className="text-xs text-ink-muted mb-1">Combined Odds</div>
+                  <div className="text-2xl font-bold text-ink font-mono">
                     {smartResult.combinedOdds.toFixed(2)}x
                   </div>
                 </div>
-                <div className="bg-gray-800/60 rounded-lg p-4">
-                  <div className="text-xs text-gray-500 mb-1">Win Probability</div>
-                  <div className="text-2xl font-bold text-white">
+                <div className="bg-surface-2/60 rounded-lg p-4">
+                  <div className="text-xs text-ink-muted mb-1">Win Probability</div>
+                  <div className="text-2xl font-bold text-ink">
                     {(smartResult.combinedProb * 100).toFixed(1)}%
                   </div>
                 </div>
-                <div className="bg-gray-800/60 rounded-lg p-4">
-                  <div className="text-xs text-gray-500 mb-1">Expected Value</div>
-                  <div className={`text-2xl font-bold font-mono ${smartResult.ev > 0 ? "text-green-400" : "text-red-400"}`}>
+                <div className="bg-surface-2/60 rounded-lg p-4">
+                  <div className="text-xs text-ink-muted mb-1">Expected Value</div>
+                  <div className={`text-2xl font-bold font-mono ${smartResult.ev > 0 ? "text-positive" : "text-risk"}`}>
                     {smartResult.ev > 0 ? "+" : ""}{smartResult.ev.toFixed(1)}%
                   </div>
                 </div>
-                <div className="bg-gray-800/60 rounded-lg p-4">
-                  <div className="text-xs text-gray-500 mb-1">Potential Payout</div>
-                  <div className="text-2xl font-bold text-white">
+                <div className="bg-surface-2/60 rounded-lg p-4">
+                  <div className="text-xs text-ink-muted mb-1">Potential Payout</div>
+                  <div className="text-2xl font-bold text-ink">
                     KES {Math.round(smartResult.potentialReturn).toLocaleString()}
                   </div>
                 </div>
               </div>
-              <div className="bg-gray-800/40 rounded-lg p-4 flex items-center gap-4 flex-wrap">
+              <div className="bg-surface-2/40 rounded-lg p-4 flex items-center gap-4 flex-wrap">
                 <div>
-                  <div className="text-xs text-gray-500 mb-1">Kelly Recommended Stake</div>
-                  <div className="text-lg font-bold text-yellow-400">
+                  <div className="text-xs text-ink-muted mb-1">Kelly Recommended Stake</div>
+                  <div className="text-lg font-bold text-watch">
                     KES {Math.round(smartResult.recommendedStake).toLocaleString()}
                   </div>
                 </div>
                 <div className="ml-auto text-right">
-                  <div className="text-xs text-gray-500 mb-1">Kelly Fraction</div>
-                  <div className="text-sm font-mono text-gray-300">
+                  <div className="text-xs text-ink-muted mb-1">Kelly Fraction</div>
+                  <div className="text-sm font-mono text-ink-muted">
                     {(smartResult.kellyFraction * 100).toFixed(1)}%
                   </div>
                 </div>
               </div>
               {!smartResult.isValueBet && (
-                <div className="bg-yellow-900/30 border border-yellow-700/40 rounded-lg p-3 text-yellow-400 text-sm">
+                <div className="bg-watch-dim border border-watch/30 rounded-lg p-3 text-watch text-sm">
                   ⚠ This acca has negative expected value — consider removing the weakest leg
                 </div>
               )}
-              <div className="text-xs text-gray-500">
+              <div className="text-xs text-ink-muted">
                 Selections loaded into bet slip below — adjust bankroll and rebuild if needed
               </div>
             </div>
@@ -518,21 +518,21 @@ export default function Accumulator() {
         {/* Left: Available Picks */}
         <div>
           <div className="mb-3 flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wide">
+            <h3 className="text-sm font-semibold text-ink-muted uppercase tracking-wide">
               Available Picks
             </h3>
-            <span className="text-xs text-gray-600">
+            <span className="text-xs text-ink-faint">
               {valuePredictions.length} value bet{valuePredictions.length !== 1 ? "s" : ""}
             </span>
           </div>
 
           {isLoading ? (
-            <div className="text-gray-500 py-12 text-center text-sm">Loading predictions…</div>
+            <div className="text-ink-muted py-12 text-center text-sm">Loading predictions…</div>
           ) : valuePredictions.length === 0 ? (
-            <div className="text-center py-14 border border-dashed border-gray-800 rounded-xl">
-              <div className="text-gray-500 text-base mb-1">No value bets available</div>
-              <div className="text-gray-600 text-xs">
-                Fetch real odds on the Opportunities page first
+            <div className="text-center py-14 border border-dashed border-line rounded-xl">
+              <div className="text-ink-muted text-base mb-1">No value bets available</div>
+              <div className="text-ink-faint text-xs">
+                Fetch real odds on the Arbitrage page first
               </div>
             </div>
           ) : (
@@ -558,7 +558,7 @@ export default function Accumulator() {
         {/* Right: Bet Slip */}
         <div>
           <div className="mb-3">
-            <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wide">
+            <h3 className="text-sm font-semibold text-ink-muted uppercase tracking-wide">
               Bet Slip
             </h3>
           </div>

@@ -1,6 +1,10 @@
 import { Router, type IRouter } from "express";
 import { eq } from "drizzle-orm";
 import { db, sportsTable } from "@workspace/db";
+import { requireAdmin } from "../middlewares/auth";
+import { validateBody, requireIntParam } from "../middlewares/validate";
+import { adminWriteLimit } from "../middlewares/limits";
+import { createSportBodySchema } from "../lib/validation-schemas";
 
 const router: IRouter = Router();
 
@@ -9,7 +13,7 @@ router.get("/sports", async (_req, res) => {
   res.json(sports);
 });
 
-router.get("/sports/:id", async (req, res) => {
+router.get("/sports/:id", requireIntParam("id"), async (req, res) => {
   const id = Number(req.params.id);
   const [sport] = await db
     .select()
@@ -22,7 +26,7 @@ router.get("/sports/:id", async (req, res) => {
   res.json(sport);
 });
 
-router.post("/sports", async (req, res) => {
+router.post("/sports", adminWriteLimit, requireAdmin, validateBody(createSportBodySchema), async (req, res) => {
   const { name, slug, isActive } = req.body as {
     name: string;
     slug: string;
@@ -44,7 +48,7 @@ router.post("/sports", async (req, res) => {
   }
 });
 
-router.delete("/sports/:id", async (req, res) => {
+router.delete("/sports/:id", adminWriteLimit, requireAdmin, requireIntParam("id"), async (req, res) => {
   const id = Number(req.params.id);
   const deleted = await db
     .delete(sportsTable)

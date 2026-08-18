@@ -6,6 +6,10 @@ import {
   bestOddsPerOutcome,
   type OddsEntry,
 } from "../lib/arbitrage";
+import { requireAdmin } from "../middlewares/auth";
+import { validateBody, requireIntParam } from "../middlewares/validate";
+import { adminWriteLimit } from "../middlewares/limits";
+import { calculateOpportunitiesBodySchema } from "../lib/validation-schemas";
 
 const router: IRouter = Router();
 
@@ -14,6 +18,15 @@ router.get("/opportunities", async (req, res) => {
     eventId?: string;
     minProfit?: string;
   };
+
+  if (eventId !== undefined && (!Number.isInteger(Number(eventId)) || Number(eventId) <= 0)) {
+    res.status(400).json({ error: "Invalid eventId — must be a positive integer" });
+    return;
+  }
+  if (minProfit !== undefined && !Number.isFinite(Number(minProfit))) {
+    res.status(400).json({ error: "Invalid minProfit — must be a number" });
+    return;
+  }
 
   const conditions = [];
   if (eventId)
@@ -31,7 +44,7 @@ router.get("/opportunities", async (req, res) => {
   res.json(opportunities);
 });
 
-router.get("/opportunities/:id", async (req, res) => {
+router.get("/opportunities/:id", requireIntParam("id"), async (req, res) => {
   const id = Number(req.params.id);
   const [opportunity] = await db
     .select()
@@ -44,8 +57,13 @@ router.get("/opportunities/:id", async (req, res) => {
   res.json(opportunity);
 });
 
-router.post("/opportunities/calculate", async (req, res) => {
-  const bankroll: number = typeof req.body?.bankroll === "number" ? req.body.bankroll : 1000;
+router.post(
+  "/opportunities/calculate",
+  adminWriteLimit,
+  requireAdmin,
+  validateBody(calculateOpportunitiesBodySchema),
+  async (req, res) => {
+  const bankroll: number = req.body?.bankroll ?? 1000;
 
   // Fetch all pending/live events
   const events = await db
@@ -111,6 +129,7 @@ router.post("/opportunities/calculate", async (req, res) => {
   }
 
   res.json({ found: newOpportunities.length, opportunities: newOpportunities });
-});
+  },
+);
 
 export default router;

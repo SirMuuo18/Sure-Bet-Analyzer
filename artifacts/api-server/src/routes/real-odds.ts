@@ -8,6 +8,8 @@ import {
   oddsTable,
   resultsTable,
 } from "@workspace/db";
+import { requireAdminOrCron } from "../middlewares/auth";
+import { ingestionLimit } from "../middlewares/limits";
 
 const router: IRouter = Router();
 
@@ -48,7 +50,7 @@ async function fetchOddsForSport(sportKey: string, apiKey: string): Promise<Odds
   return resp.json() as Promise<OddsApiGame[]>;
 }
 
-router.post("/fetch-real-odds", async (req, res) => {
+router.post("/fetch-real-odds", ingestionLimit, requireAdminOrCron, async (req, res) => {
   const apiKey = process.env.ODDS_API_KEY;
   if (!apiKey) {
     res.status(400).json({ error: "ODDS_API_KEY not configured" });
@@ -184,7 +186,7 @@ async function fetchScoresForSport(sportKey: string, apiKey: string): Promise<Od
   return resp.json() as Promise<OddsApiCompletedGame[]>;
 }
 
-router.post("/fetch-results", async (req, res) => {
+router.post("/fetch-results", ingestionLimit, requireAdminOrCron, async (req, res) => {
   const apiKey = process.env.ODDS_API_KEY;
   if (!apiKey) {
     res.status(400).json({ error: "ODDS_API_KEY not configured" });

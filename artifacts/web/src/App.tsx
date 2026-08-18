@@ -1,12 +1,16 @@
 import { useState } from "react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import Home from "./pages/Home"
+import Games from "./pages/Games"
+import Value from "./pages/Value"
+import Insights from "./pages/Insights"
 import Opportunities from "./pages/Opportunities"
-import Events from "./pages/Events"
-import Odds from "./pages/Odds"
-import Setup from "./pages/Setup"
-import Predictions from "./pages/Predictions"
 import Accumulator from "./pages/Accumulator"
 import StrategyHub from "./pages/StrategyHub"
+import Manage from "./pages/Manage"
+import Sidebar from "./components/Sidebar"
+import BottomNav from "./components/BottomNav"
+import type { Tab } from "./lib/nav"
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -14,60 +18,27 @@ const queryClient = new QueryClient({
   },
 })
 
-type Tab = "opportunities" | "predictions" | "accumulator" | "events" | "odds" | "setup" | "strategy"
-
-const TABS: { id: Tab; label: string }[] = [
-  { id: "opportunities", label: "Opportunities" },
-  { id: "predictions", label: "✦ Predictions" },
-  { id: "accumulator", label: "🎯 Accumulator" },
-  { id: "events", label: "Events" },
-  { id: "odds", label: "Odds" },
-  { id: "setup", label: "Setup" },
-  { id: "strategy", label: "📊 Strategy" },
-]
-
 function Layout() {
-  const [activeTab, setActiveTab] = useState<Tab>("opportunities")
+  const [activeTab, setActiveTab] = useState<Tab>("home")
 
   return (
-    <div className="min-h-screen bg-gray-950 text-gray-100 flex">
-      {/* Sidebar */}
-      <aside className="w-56 bg-gray-900 border-r border-gray-800 flex flex-col shrink-0">
-        <div className="px-6 py-5 border-b border-gray-800">
-          <h1 className="text-lg font-bold text-white tracking-tight">
-            Sure-Bet
-          </h1>
-          <p className="text-xs text-gray-500 mt-0.5">Arbitrage Analyzer</p>
-        </div>
-        <nav className="flex-1 py-4">
-          {TABS.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`w-full text-left px-6 py-3 text-sm font-medium transition-colors ${
-                activeTab === tab.id
-                  ? "bg-gray-800 text-white border-r-2 border-green-500"
-                  : "text-gray-400 hover:text-white hover:bg-gray-800/50"
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </nav>
-      </aside>
+    <div className="min-h-screen bg-canvas text-ink flex">
+      <Sidebar active={activeTab} onSelect={setActiveTab} />
 
-      {/* Main content */}
-      <main className="flex-1 overflow-auto">
-        <div className="max-w-6xl mx-auto p-8">
-          {activeTab === "opportunities" && <Opportunities />}
-          {activeTab === "predictions" && <Predictions />}
+      <main className="flex-1 min-w-0 overflow-x-hidden pb-20 md:pb-0">
+        <div className="max-w-6xl mx-auto p-5 sm:p-8">
+          {activeTab === "home" && <Home onViewAllGames={() => setActiveTab("games")} />}
+          {activeTab === "games" && <Games />}
+          {activeTab === "value" && <Value />}
+          {activeTab === "insights" && <Insights />}
+          {activeTab === "arbitrage" && <Opportunities />}
           {activeTab === "accumulator" && <Accumulator />}
-          {activeTab === "events" && <Events />}
-          {activeTab === "odds" && <Odds />}
-          {activeTab === "setup" && <Setup />}
           {activeTab === "strategy" && <StrategyHub />}
+          {activeTab === "manage" && <Manage />}
         </div>
       </main>
+
+      <BottomNav active={activeTab} onSelect={setActiveTab} />
     </div>
   )
 }

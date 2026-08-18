@@ -1,6 +1,8 @@
 import { Router, type IRouter } from "express";
 import { eq } from "drizzle-orm";
 import { db, eventsTable, oddsTable } from "@workspace/db";
+import { validateBody, validateQuery } from "../middlewares/validate";
+import { accumulatorBodySchema, smartPicksQuerySchema } from "../lib/validation-schemas";
 
 const router: IRouter = Router();
 
@@ -109,16 +111,11 @@ function buildAccumulatorResult(
 
 // ─── POST /accumulator ───────────────────────────────────────────────────────
 
-router.post("/accumulator", async (req, res) => {
-  const { selections: reqSelections, bankroll = 1000 } = req.body as {
+router.post("/accumulator", validateBody(accumulatorBodySchema), async (req, res) => {
+  const { selections: reqSelections, bankroll } = req.body as {
     selections: Array<{ eventId: number; outcome: OutcomeKey }>;
     bankroll: number;
   };
-
-  if (!Array.isArray(reqSelections) || reqSelections.length < 2) {
-    res.status(400).json({ error: "At least 2 selections are required" });
-    return;
-  }
 
   const resolvedSelections: AccumulatorSelection[] = [];
 
@@ -165,8 +162,9 @@ router.post("/accumulator", async (req, res) => {
 
 // ─── GET /accumulator/smart-picks ───────────────────────────────────────────
 
-router.get("/accumulator/smart-picks", async (req, res) => {
-  const bankroll = Number(req.query.bankroll) || 1000;
+router.get("/accumulator/smart-picks", validateQuery(smartPicksQuerySchema), async (req, res) => {
+  const { bankroll = 1000 } = (req as typeof req & { validatedQuery: { bankroll?: number } })
+    .validatedQuery;
 
   const events = await db
     .select()

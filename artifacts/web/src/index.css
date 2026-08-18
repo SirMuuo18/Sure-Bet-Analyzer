@@ -1,1 +1,76 @@
 @import "tailwindcss";
+@import "@fontsource-variable/inter";
+
+@theme {
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* Surfaces — near-black graphite, dark-first */
+  --color-canvas: #0a0b0d;
+  --color-surface: #16181c;
+  --color-surface-2: #1e2126;
+  --color-surface-hover: #24272d;
+
+  /* Borders */
+  --color-line: #26292f;
+  --color-line-strong: #383c44;
+
+  /* Typography */
+  --color-ink: #f2f1ec;
+  --color-ink-muted: #94979f;
+  --color-ink-faint: #5c5f68;
+
+  /* Signature accent — steel cyan (terminal, not generic SaaS blue/purple) */
+  --color-accent: #29b6c4;
+  --color-accent-strong: #4ecbd7;
+  --color-accent-dim: #1b3a3e;
+
+  /* Semantic — used sparingly */
+  --color-positive: #3ebd6b;
+  --color-positive-dim: #1a2e21;
+  --color-watch: #e0a83e;
+  --color-watch-dim: #2e2717;
+  --color-risk: #e0605a;
+  --color-risk-dim: #301c1b;
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+  }
+
+  ::selection {
+    background-color: var(--color-accent-dim);
+    color: var(--color-accent-strong);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  * {
+    scrollbar-color: var(--color-line-strong) transparent;
+  }
+}
+
+@layer utilities {
+  .nums {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -7,6 +7,8 @@ import {
   eventsTable,
   oddsTable,
 } from "@workspace/db";
+import { requireAdmin } from "../middlewares/auth";
+import { adminWriteLimit } from "../middlewares/limits";
 
 const router: IRouter = Router();
 
@@ -24,7 +26,7 @@ const router: IRouter = Router();
  * Best:     home=2.20, draw=3.70, away=3.90
  * Implied:  0.4545 + 0.2703 + 0.2564 = 0.9812  → +1.92% profit
  */
-router.post("/seed", async (_req, res) => {
+router.post("/seed", adminWriteLimit, requireAdmin, async (_req, res) => {
   // ── Sport ──────────────────────────────────────────────────────────────────
   let [sport] = await db
     .select()

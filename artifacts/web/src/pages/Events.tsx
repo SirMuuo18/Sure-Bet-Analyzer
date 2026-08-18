@@ -1,12 +1,12 @@
 import { useState } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { getEvents, getSports, createEvent, type EventStatus } from "../api"
+import { getEvents, getSports, createEvent, apiErrorMessage, type EventStatus } from "../api"
 
 const STATUS_COLORS: Record<EventStatus, string> = {
-  pending: "bg-yellow-500/20 text-yellow-400",
-  live: "bg-green-500/20 text-green-400",
-  completed: "bg-gray-700 text-gray-400",
-  cancelled: "bg-red-500/20 text-red-400",
+  pending: "bg-watch/20 text-watch",
+  live: "bg-positive/20 text-positive",
+  completed: "bg-surface-hover text-ink-muted",
+  cancelled: "bg-risk/20 text-risk",
 }
 
 function formatDate(iso: string) {
@@ -47,7 +47,7 @@ export default function Events() {
       setForm({ sportId: "", homeTeam: "", awayTeam: "", startsAt: "" })
       setError(null)
     },
-    onError: (e: Error) => setError(e.message),
+    onError: (e: Error) => setError(apiErrorMessage(e)),
   })
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -69,20 +69,18 @@ export default function Events() {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-white mb-6">Events</h2>
-
       {/* Add Event Form */}
-      <div className="bg-gray-900 border border-gray-800 rounded-lg p-5 mb-6">
-        <h3 className="text-base font-semibold text-white mb-4">Add Event</h3>
+      <div className="bg-surface border border-line rounded-lg p-5 mb-6">
+        <h3 className="text-base font-semibold text-ink mb-4">Add Event</h3>
         <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-medium text-gray-400 mb-1">
+            <label className="block text-xs font-medium text-ink-muted mb-1">
               Sport
             </label>
             <select
               value={form.sportId}
               onChange={(e) => setForm({ ...form, sportId: e.target.value })}
-              className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-green-500"
+              className="w-full bg-surface-2 border border-line-strong rounded px-3 py-2 text-sm text-ink focus:outline-none focus:border-accent"
             >
               <option value="">Select sport…</option>
               {sports.map((s) => (
@@ -93,18 +91,18 @@ export default function Events() {
             </select>
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-400 mb-1">
+            <label className="block text-xs font-medium text-ink-muted mb-1">
               Starts At
             </label>
             <input
               type="datetime-local"
               value={form.startsAt}
               onChange={(e) => setForm({ ...form, startsAt: e.target.value })}
-              className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-green-500"
+              className="w-full bg-surface-2 border border-line-strong rounded px-3 py-2 text-sm text-ink focus:outline-none focus:border-accent"
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-400 mb-1">
+            <label className="block text-xs font-medium text-ink-muted mb-1">
               Home Team
             </label>
             <input
@@ -112,11 +110,11 @@ export default function Events() {
               value={form.homeTeam}
               onChange={(e) => setForm({ ...form, homeTeam: e.target.value })}
               placeholder="e.g. Arsenal"
-              className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-green-500"
+              className="w-full bg-surface-2 border border-line-strong rounded px-3 py-2 text-sm text-ink placeholder-ink-faint focus:outline-none focus:border-accent"
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-400 mb-1">
+            <label className="block text-xs font-medium text-ink-muted mb-1">
               Away Team
             </label>
             <input
@@ -124,20 +122,20 @@ export default function Events() {
               value={form.awayTeam}
               onChange={(e) => setForm({ ...form, awayTeam: e.target.value })}
               placeholder="e.g. Chelsea"
-              className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-green-500"
+              className="w-full bg-surface-2 border border-line-strong rounded px-3 py-2 text-sm text-ink placeholder-ink-faint focus:outline-none focus:border-accent"
             />
           </div>
           <div className="col-span-2 flex items-center gap-3">
             <button
               type="submit"
               disabled={mutation.isPending}
-              className="px-4 py-2 bg-green-600 hover:bg-green-500 disabled:bg-green-900 disabled:text-green-700 text-white text-sm font-semibold rounded transition-colors"
+              className="px-4 py-2 bg-accent hover:bg-accent-strong disabled:bg-surface-2 disabled:text-ink-faint text-canvas text-sm font-semibold rounded transition-colors"
             >
               {mutation.isPending ? "Adding…" : "Add Event"}
             </button>
-            {error && <span className="text-red-400 text-sm">{error}</span>}
+            {error && <span className="text-risk text-sm">{error}</span>}
             {mutation.isSuccess && (
-              <span className="text-green-400 text-sm">Event added!</span>
+              <span className="text-positive text-sm">Event added!</span>
             )}
           </div>
         </form>
@@ -148,7 +146,7 @@ export default function Events() {
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value as EventStatus | "")}
-          className="bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-green-500"
+          className="bg-surface-2 border border-line-strong rounded px-3 py-2 text-sm text-ink focus:outline-none focus:border-accent"
         >
           <option value="">All statuses</option>
           <option value="pending">Pending</option>
@@ -159,7 +157,7 @@ export default function Events() {
         <select
           value={sportFilter}
           onChange={(e) => setSportFilter(e.target.value)}
-          className="bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-green-500"
+          className="bg-surface-2 border border-line-strong rounded px-3 py-2 text-sm text-ink focus:outline-none focus:border-accent"
         >
           <option value="">All sports</option>
           {sports.map((s) => (
@@ -172,24 +170,24 @@ export default function Events() {
 
       {/* Events Table */}
       {isLoading ? (
-        <div className="text-gray-500 py-12 text-center">Loading…</div>
+        <div className="text-ink-muted py-12 text-center">Loading…</div>
       ) : events.length === 0 ? (
-        <div className="text-center py-12 text-gray-600">No events found.</div>
+        <div className="text-center py-12 text-ink-faint">No events found.</div>
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-gray-800">
+        <div className="overflow-x-auto rounded-lg border border-line">
           <table className="w-full">
             <thead>
-              <tr className="bg-gray-800/60 text-left">
-                <th className="py-3 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+              <tr className="bg-surface-2/60 text-left">
+                <th className="py-3 px-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">
                   Match
                 </th>
-                <th className="py-3 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                <th className="py-3 px-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">
                   Sport
                 </th>
-                <th className="py-3 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                <th className="py-3 px-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">
                   Starts At
                 </th>
-                <th className="py-3 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                <th className="py-3 px-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">
                   Status
                 </th>
               </tr>
@@ -198,15 +196,15 @@ export default function Events() {
               {events.map((event) => (
                 <tr
                   key={event.id}
-                  className="border-b border-gray-800 hover:bg-gray-800/40 transition-colors"
+                  className="border-b border-line hover:bg-surface-2/40 transition-colors"
                 >
-                  <td className="py-3 px-4 text-sm font-medium text-white">
+                  <td className="py-3 px-4 text-sm font-medium text-ink">
                     {event.homeTeam} vs {event.awayTeam}
                   </td>
-                  <td className="py-3 px-4 text-sm text-gray-400">
+                  <td className="py-3 px-4 text-sm text-ink-muted">
                     {getSportName(event.sportId)}
                   </td>
-                  <td className="py-3 px-4 text-sm text-gray-400">
+                  <td className="py-3 px-4 text-sm text-ink-muted">
                     {formatDate(event.startsAt)}
                   </td>
                   <td className="py-3 px-4">

@@ -5,6 +5,7 @@ import {
   getBookmakers,
   createSport,
   createBookmaker,
+  apiErrorMessage,
 } from "../api"
 
 function SportsPanel() {
@@ -24,7 +25,7 @@ function SportsPanel() {
       setForm({ name: "", slug: "" })
       setError(null)
     },
-    onError: (e: Error) => setError(e.message),
+    onError: (e: Error) => setError(apiErrorMessage(e)),
   })
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -45,63 +46,63 @@ function SportsPanel() {
   }
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-lg p-5">
-      <h3 className="text-base font-semibold text-white mb-4">Sports</h3>
+    <div className="bg-surface border border-line rounded-lg p-5">
+      <h3 className="text-base font-semibold text-ink mb-4">Sports</h3>
 
       {/* Add form */}
       <form onSubmit={handleSubmit} className="mb-5 space-y-3">
         <div>
-          <label className="block text-xs font-medium text-gray-400 mb-1">Name</label>
+          <label className="block text-xs font-medium text-ink-muted mb-1">Name</label>
           <input
             type="text"
             value={form.name}
             onChange={(e) => handleNameChange(e.target.value)}
             placeholder="e.g. Football"
-            className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-green-500"
+            className="w-full bg-surface-2 border border-line-strong rounded px-3 py-2 text-sm text-ink placeholder-ink-faint focus:outline-none focus:border-accent"
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-gray-400 mb-1">Slug</label>
+          <label className="block text-xs font-medium text-ink-muted mb-1">Slug</label>
           <input
             type="text"
             value={form.slug}
             onChange={(e) => setForm({ ...form, slug: e.target.value })}
             placeholder="e.g. football"
-            className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-green-500"
+            className="w-full bg-surface-2 border border-line-strong rounded px-3 py-2 text-sm text-ink placeholder-ink-faint focus:outline-none focus:border-accent"
           />
         </div>
         <div className="flex items-center gap-3">
           <button
             type="submit"
             disabled={mutation.isPending}
-            className="px-3 py-1.5 bg-green-600 hover:bg-green-500 disabled:bg-green-900 disabled:text-green-700 text-white text-sm font-semibold rounded transition-colors"
+            className="px-3 py-1.5 bg-accent hover:bg-accent-strong disabled:bg-surface-2 disabled:text-ink-faint text-canvas text-sm font-semibold rounded transition-colors"
           >
             {mutation.isPending ? "Adding…" : "Add Sport"}
           </button>
           {mutation.isSuccess && (
-            <span className="text-green-400 text-xs">Added!</span>
+            <span className="text-positive text-xs">Added!</span>
           )}
         </div>
-        {error && <p className="text-red-400 text-xs">{error}</p>}
+        {error && <p className="text-risk text-xs">{error}</p>}
       </form>
 
       {/* List */}
       {isLoading ? (
-        <div className="text-gray-500 text-sm">Loading…</div>
+        <div className="text-ink-muted text-sm">Loading…</div>
       ) : sports.length === 0 ? (
-        <div className="text-gray-600 text-sm">No sports yet.</div>
+        <div className="text-ink-faint text-sm">No sports yet.</div>
       ) : (
-        <div className="overflow-x-auto rounded border border-gray-800">
+        <div className="overflow-x-auto rounded border border-line">
           <table className="w-full">
             <thead>
-              <tr className="bg-gray-800/60 text-left">
-                <th className="py-2 px-3 text-xs font-semibold text-gray-400 uppercase">
+              <tr className="bg-surface-2/60 text-left">
+                <th className="py-2 px-3 text-xs font-semibold text-ink-muted uppercase">
                   Name
                 </th>
-                <th className="py-2 px-3 text-xs font-semibold text-gray-400 uppercase">
+                <th className="py-2 px-3 text-xs font-semibold text-ink-muted uppercase">
                   Slug
                 </th>
-                <th className="py-2 px-3 text-xs font-semibold text-gray-400 uppercase">
+                <th className="py-2 px-3 text-xs font-semibold text-ink-muted uppercase">
                   Active
                 </th>
               </tr>
@@ -110,16 +111,16 @@ function SportsPanel() {
               {sports.map((sport) => (
                 <tr
                   key={sport.id}
-                  className="border-b border-gray-800 last:border-0"
+                  className="border-b border-line last:border-0"
                 >
-                  <td className="py-2 px-3 text-sm text-white">{sport.name}</td>
-                  <td className="py-2 px-3 text-sm text-gray-400 font-mono">
+                  <td className="py-2 px-3 text-sm text-ink">{sport.name}</td>
+                  <td className="py-2 px-3 text-sm text-ink-muted font-mono">
                     {sport.slug}
                   </td>
                   <td className="py-2 px-3">
                     <span
                       className={`text-xs font-medium ${
-                        sport.isActive ? "text-green-400" : "text-gray-500"
+                        sport.isActive ? "text-positive" : "text-ink-muted"
                       }`}
                     >
                       {sport.isActive ? "Yes" : "No"}
@@ -152,7 +153,7 @@ function BookmakersPanel() {
       setForm({ name: "", url: "" })
       setError(null)
     },
-    onError: (e: Error) => setError(e.message),
+    onError: (e: Error) => setError(apiErrorMessage(e)),
   })
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -165,65 +166,65 @@ function BookmakersPanel() {
   }
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-lg p-5">
-      <h3 className="text-base font-semibold text-white mb-4">Bookmakers</h3>
+    <div className="bg-surface border border-line rounded-lg p-5">
+      <h3 className="text-base font-semibold text-ink mb-4">Bookmakers</h3>
 
       {/* Add form */}
       <form onSubmit={handleSubmit} className="mb-5 space-y-3">
         <div>
-          <label className="block text-xs font-medium text-gray-400 mb-1">Name</label>
+          <label className="block text-xs font-medium text-ink-muted mb-1">Name</label>
           <input
             type="text"
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
             placeholder="e.g. Bet365"
-            className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-green-500"
+            className="w-full bg-surface-2 border border-line-strong rounded px-3 py-2 text-sm text-ink placeholder-ink-faint focus:outline-none focus:border-accent"
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-gray-400 mb-1">
-            URL <span className="text-gray-600">(optional)</span>
+          <label className="block text-xs font-medium text-ink-muted mb-1">
+            URL <span className="text-ink-faint">(optional)</span>
           </label>
           <input
             type="url"
             value={form.url}
             onChange={(e) => setForm({ ...form, url: e.target.value })}
             placeholder="https://bet365.com"
-            className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-green-500"
+            className="w-full bg-surface-2 border border-line-strong rounded px-3 py-2 text-sm text-ink placeholder-ink-faint focus:outline-none focus:border-accent"
           />
         </div>
         <div className="flex items-center gap-3">
           <button
             type="submit"
             disabled={mutation.isPending}
-            className="px-3 py-1.5 bg-green-600 hover:bg-green-500 disabled:bg-green-900 disabled:text-green-700 text-white text-sm font-semibold rounded transition-colors"
+            className="px-3 py-1.5 bg-accent hover:bg-accent-strong disabled:bg-surface-2 disabled:text-ink-faint text-canvas text-sm font-semibold rounded transition-colors"
           >
             {mutation.isPending ? "Adding…" : "Add Bookmaker"}
           </button>
           {mutation.isSuccess && (
-            <span className="text-green-400 text-xs">Added!</span>
+            <span className="text-positive text-xs">Added!</span>
           )}
         </div>
-        {error && <p className="text-red-400 text-xs">{error}</p>}
+        {error && <p className="text-risk text-xs">{error}</p>}
       </form>
 
       {/* List */}
       {isLoading ? (
-        <div className="text-gray-500 text-sm">Loading…</div>
+        <div className="text-ink-muted text-sm">Loading…</div>
       ) : bookmakers.length === 0 ? (
-        <div className="text-gray-600 text-sm">No bookmakers yet.</div>
+        <div className="text-ink-faint text-sm">No bookmakers yet.</div>
       ) : (
-        <div className="overflow-x-auto rounded border border-gray-800">
+        <div className="overflow-x-auto rounded border border-line">
           <table className="w-full">
             <thead>
-              <tr className="bg-gray-800/60 text-left">
-                <th className="py-2 px-3 text-xs font-semibold text-gray-400 uppercase">
+              <tr className="bg-surface-2/60 text-left">
+                <th className="py-2 px-3 text-xs font-semibold text-ink-muted uppercase">
                   Name
                 </th>
-                <th className="py-2 px-3 text-xs font-semibold text-gray-400 uppercase">
+                <th className="py-2 px-3 text-xs font-semibold text-ink-muted uppercase">
                   URL
                 </th>
-                <th className="py-2 px-3 text-xs font-semibold text-gray-400 uppercase">
+                <th className="py-2 px-3 text-xs font-semibold text-ink-muted uppercase">
                   Active
                 </th>
               </tr>
@@ -232,27 +233,27 @@ function BookmakersPanel() {
               {bookmakers.map((bm) => (
                 <tr
                   key={bm.id}
-                  className="border-b border-gray-800 last:border-0"
+                  className="border-b border-line last:border-0"
                 >
-                  <td className="py-2 px-3 text-sm text-white">{bm.name}</td>
-                  <td className="py-2 px-3 text-sm text-gray-400 font-mono text-xs">
+                  <td className="py-2 px-3 text-sm text-ink">{bm.name}</td>
+                  <td className="py-2 px-3 text-sm text-ink-muted font-mono text-xs">
                     {bm.url ? (
                       <a
                         href={bm.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-400 hover:text-blue-300"
+                        className="text-accent-strong hover:text-accent-strong"
                       >
                         {bm.url}
                       </a>
                     ) : (
-                      <span className="text-gray-600">—</span>
+                      <span className="text-ink-faint">—</span>
                     )}
                   </td>
                   <td className="py-2 px-3">
                     <span
                       className={`text-xs font-medium ${
-                        bm.isActive ? "text-green-400" : "text-gray-500"
+                        bm.isActive ? "text-positive" : "text-ink-muted"
                       }`}
                     >
                       {bm.isActive ? "Yes" : "No"}
@@ -270,12 +271,9 @@ function BookmakersPanel() {
 
 export default function Setup() {
   return (
-    <div>
-      <h2 className="text-2xl font-bold text-white mb-6">Setup</h2>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <SportsPanel />
-        <BookmakersPanel />
-      </div>
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <SportsPanel />
+      <BookmakersPanel />
     </div>
   )
 }

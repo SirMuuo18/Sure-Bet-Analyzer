@@ -1,9 +1,40 @@
-import axios from "axios"
+import axios, { type AxiosError } from "axios"
+import { getAdminKey } from "./lib/adminAuth"
 
 export const http = axios.create({
   baseURL: "/api",
   headers: { "Content-Type": "application/json" },
 })
+
+// Admin-only writes check this header server-side; harmless to attach to
+// every request since public GETs simply ignore it.
+http.interceptors.request.use((config) => {
+  const key = getAdminKey()
+  if (key) {
+    config.headers.Authorization = `Bearer ${key}`
+  }
+  return config
+})
+
+/** Extracts the server's `{ error }` JSON message, falling back to a status-coded default. */
+export function apiErrorMessage(err: unknown): string {
+  const axiosErr = err as AxiosError<{ error?: string }>
+  const serverMessage = axiosErr?.response?.data?.error
+  if (serverMessage) return serverMessage
+
+  switch (axiosErr?.response?.status) {
+    case 401:
+      return "You need to sign in as admin to do that."
+    case 403:
+      return "Your admin credentials don't have permission to do that."
+    case 400:
+      return "That request looks invalid — check the fields and try again."
+    case 429:
+      return "Too many requests — please slow down."
+    default:
+      return axiosErr instanceof Error ? axiosErr.message : "Something went wrong."
+  }
+}
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
