@@ -4,27 +4,63 @@
 @theme {
   --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
 
-  /* Surfaces — near-black graphite, dark-first */
+  /* Light is the default theme — see the unlayered [data-theme="dark"] block
+     below for the dark overrides. Values here intentionally mirror the dark
+     palette's structure (same roles, same accent hue) so both themes read as
+     the same product. */
+
+  /* Surfaces */
+  --color-canvas: #f6f6f4;
+  --color-surface: #ffffff;
+  --color-surface-2: #f0f0ee;
+  --color-surface-hover: #e7e7e4;
+
+  /* Borders */
+  --color-line: #e2e2de;
+  --color-line-strong: #c9c9c3;
+
+  /* Typography */
+  --color-ink: #15171b;
+  --color-ink-muted: #5d6067;
+  --color-ink-faint: #93969c;
+
+  /* Signature accent — steel cyan (terminal, not generic SaaS blue/purple).
+     Darker than the dark-theme accent so it holds contrast as text/icons on
+     a white surface, not just as a fill. */
+  --color-accent: #12808c;
+  --color-accent-strong: #0c6870;
+  --color-accent-dim: #dcf1f2;
+
+  /* Semantic — used sparingly, darkened for contrast on light surfaces */
+  --color-positive: #1c8a4b;
+  --color-positive-dim: #e2f5e8;
+  --color-watch: #a86c14;
+  --color-watch-dim: #faf0da;
+  --color-risk: #c33d36;
+  --color-risk-dim: #fbe5e3;
+}
+
+/* Dark theme override — applied when the user explicitly toggles it (see
+   hooks/useTheme.ts). Deliberately NOT gated on prefers-color-scheme: the
+   product default is light regardless of OS setting; dark is opt-in.
+   Left unlayered so it reliably wins over @theme's own :root layer. */
+:root[data-theme="dark"] {
   --color-canvas: #0a0b0d;
   --color-surface: #16181c;
   --color-surface-2: #1e2126;
   --color-surface-hover: #24272d;
 
-  /* Borders */
   --color-line: #26292f;
   --color-line-strong: #383c44;
 
-  /* Typography */
   --color-ink: #f2f1ec;
   --color-ink-muted: #94979f;
   --color-ink-faint: #5c5f68;
 
-  /* Signature accent — steel cyan (terminal, not generic SaaS blue/purple) */
   --color-accent: #29b6c4;
   --color-accent-strong: #4ecbd7;
   --color-accent-dim: #1b3a3e;
 
-  /* Semantic — used sparingly */
   --color-positive: #3ebd6b;
   --color-positive-dim: #1a2e21;
   --color-watch: #e0a83e;
@@ -37,12 +73,18 @@
   html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    color-scheme: light;
+  }
+
+  html[data-theme="dark"] {
+    color-scheme: dark;
   }
 
   body {
     background-color: var(--color-canvas);
     color: var(--color-ink);
     font-family: var(--font-sans);
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
 
   ::selection {

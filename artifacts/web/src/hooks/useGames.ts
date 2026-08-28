@@ -21,14 +21,18 @@ export function useGames() {
   const bookmakersById: Record<number, string> = {}
   for (const b of bookmakersQ.data ?? []) bookmakersById[b.id] = b.name
 
-  const games: Game[] = (predictionsQ.data ?? []).map((p) => {
-    const event = eventsById.get(p.eventId) ?? null
-    return {
-      ...p,
-      sportName: event ? (sportsById.get(event.sportId) ?? "Sport") : "Sport",
-      event,
-    }
-  })
+  const games: Game[] = (predictionsQ.data ?? [])
+    .map((p) => {
+      const event = eventsById.get(p.eventId) ?? null
+      return {
+        ...p,
+        sportName: event ? (sportsById.get(event.sportId) ?? "Sport") : "Sport",
+        event,
+      }
+    })
+    // Soonest-first — every consumer of useGames is implicitly browsing
+    // "upcoming" matches, so that's the natural default order.
+    .sort((a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime())
 
   return {
     games,

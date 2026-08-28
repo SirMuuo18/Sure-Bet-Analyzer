@@ -1,4 +1,5 @@
 import { PRIMARY_NAV, TOOLS_NAV, UTILITY_NAV, type Tab } from "../lib/nav"
+import ThemeToggle from "./ThemeToggle"
 
 function NavGroup({
   label,
@@ -54,6 +55,9 @@ export default function Sidebar({ active, onSelect }: { active: Tab; onSelect: (
         <NavGroup label="Tools" items={TOOLS_NAV} active={active} onSelect={onSelect} />
         <NavGroup label="" items={UTILITY_NAV} active={active} onSelect={onSelect} />
       </nav>
+      <div className="px-3 py-2 border-t border-line">
+        <ThemeToggle />
+      </div>
       <div className="px-6 py-4 border-t border-line text-[11px] text-ink-faint leading-relaxed">
         Predictions are probabilistic, not guaranteed. Bet responsibly.
       </div>

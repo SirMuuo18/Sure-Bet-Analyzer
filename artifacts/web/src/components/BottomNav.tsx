@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { PRIMARY_NAV, MOBILE_MORE_NAV, type Tab } from "../lib/nav"
 import { MoreIcon, CloseIcon } from "./icons"
+import ThemeToggle from "./ThemeToggle"
 
 export default function BottomNav({ active, onSelect }: { active: Tab; onSelect: (tab: Tab) => void }) {
   const [moreOpen, setMoreOpen] = useState(false)
@@ -23,9 +24,12 @@ export default function BottomNav({ active, onSelect }: { active: Tab; onSelect:
           <div className="relative w-full bg-surface border-t border-line rounded-t-2xl p-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
             <div className="flex items-center justify-between mb-3 px-2">
               <span className="text-sm font-semibold text-ink">More</span>
-              <button onClick={() => setMoreOpen(false)} aria-label="Close menu" className="p-1.5 text-ink-muted hover:text-ink">
-                <CloseIcon className="w-5 h-5" />
-              </button>
+              <div className="flex items-center gap-1">
+                <ThemeToggle compact />
+                <button onClick={() => setMoreOpen(false)} aria-label="Close menu" className="p-1.5 text-ink-muted hover:text-ink">
+                  <CloseIcon className="w-5 h-5" />
+                </button>
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-2">
               {MOBILE_MORE_NAV.map((item) => {
