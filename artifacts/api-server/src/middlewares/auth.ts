@@ -44,17 +44,33 @@ export function requireAdmin(req: Request, res: Response, next: NextFunction): v
 
 /**
  * For trusted server-side ingestion (odds/results fetch from the paid
- * upstream API). Accepts either the admin bearer token (today's only
- * caller — an operator triggering a refresh from Manage/Arbitrage) or a
- * separate `x-cron-secret` header matched against CRON_SECRET, so a future
- * scheduled job can call these without being handed the admin key. Falls
- * back to requireAdmin's 401/403/500 semantics when no cron secret matches.
+ * upstream API). Accepts, in order:
+ *
+ * 1. `Authorization: Bearer <CRON_SECRET>` — Vercel Cron Jobs automatically
+ *    send this exact header (from the project's CRON_SECRET env var) when
+ *    invoking a scheduled path; Vercel Cron cannot set arbitrary custom
+ *    headers, so this is the only way a *real* Vercel cron request can prove
+ *    itself.
+ * 2. A legacy `x-cron-secret` header matched against CRON_SECRET, kept for
+ *    any non-Vercel scheduler (e.g. a GitHub Action) that can set arbitrary
+ *    headers.
+ * 3. Falls back to requireAdmin's normal 401/403/500 semantics — today's
+ *    only caller is an operator triggering a manual refresh from the UI.
  */
 export function requireAdminOrCron(req: Request, res: Response, next: NextFunction): void {
   const cronSecret = process.env.CRON_SECRET;
-  const provided = req.headers["x-cron-secret"];
 
-  if (cronSecret && typeof provided === "string" && safeEquals(provided, cronSecret)) {
+  const authHeader = req.headers.authorization;
+  if (cronSecret && authHeader && authHeader.startsWith("Bearer ")) {
+    const token = authHeader.slice("Bearer ".length).trim();
+    if (token && safeEquals(token, cronSecret)) {
+      next();
+      return;
+    }
+  }
+
+  const legacyHeader = req.headers["x-cron-secret"];
+  if (cronSecret && typeof legacyHeader === "string" && safeEquals(legacyHeader, cronSecret)) {
     next();
     return;
   }
